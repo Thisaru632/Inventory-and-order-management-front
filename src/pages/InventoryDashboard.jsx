@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, AlertTriangle, Package, Warehouse, TrendingDown, TrendingUp, AlertCircle, PackageCheck, LayoutDashboard, Calendar as CalendarIcon, ChevronLeft, ChevronRight, X, BrainCircuit, BarChart2 } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
 
@@ -25,7 +26,8 @@ const InventoryDashboard = () => {
   const [stores, setStores] = useState([]);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [selectedLocation, setSelectedLocation] = useState('All Warehouses');
-  const tabs = ['Dashboard', 'Order Calendar', 'Future Predictions'];
+  const [selectedMaterialForAnalysis, setSelectedMaterialForAnalysis] = useState('All Materials');
+  const tabs = ['Dashboard', 'Order Calendar', 'Future Predictions', 'Analysis'];
   
   const [selectedCalendarDate, setSelectedCalendarDate] = useState(null);
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
@@ -42,34 +44,30 @@ const InventoryDashboard = () => {
   for (let i = 0; i < startDay; i++) calendarDays.push(null);
   for (let i = 1; i <= daysInMonth; i++) calendarDays.push(i);
 
-  const mockCalendarOrders = {
-    4: [{ id: 'ORD-9821', customer: 'Lanka Builders', product: 'Steel Beams', qty: 10, status: 'Delivered' }],
-    [today.getDate()]: [
-      { id: 'ORD-9872', customer: "Perera Hardware", product: 'Premium Steel Beams', qty: 2, status: 'Pending' },
-      { id: 'ORD-9873', customer: "Silva Workshop", product: 'Copper Wiring Bundle', qty: 5, status: 'Pending' }
-    ],
-    18: [{ id: 'ORD-9901', customer: 'Colombo Construction', product: 'Cement Bags', qty: 50, status: 'Processing' }]
-  };
+  const calendarOrders = {};
+  allDeliveries.forEach(d => {
+    const dDate = new Date(d.scheduledDate || d.createdAt);
+    if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear) {
+      const day = dDate.getDate();
+      if (!calendarOrders[day]) calendarOrders[day] = [];
+      calendarOrders[day].push({
+        id: `DEL-${d._id.substring(d._id.length - 6).toUpperCase()}`,
+        customer: d.customerShopName || 'Unknown Customer',
+        product: d.material?.name || 'Unknown Product',
+        qty: `${d.quantity} ${d.unit || ''}`.trim(),
+        status: d.status || 'PENDING'
+      });
+    }
+  });
+
+  const mockInventory = [];
+  const mockPredictions = [];
 
   const handleDateClick = (day) => {
-    if (!day || !mockCalendarOrders[day]) return;
+    if (!day || !calendarOrders[day]) return;
     setSelectedCalendarDate(day);
     setIsCalendarModalOpen(true);
   };
-
-  const mockInventory = [
-    { _id: '1', material: { name: 'Steel Beams', sku: 'STL-001', baseUnit: 'ton', minStockAlert: 10 }, store: { name: 'Anuradhapura Central' }, quantityInBaseUnit: 5, availableQuantity: 5 },
-    { _id: '2', material: { name: 'Cement', sku: 'CMT-001', baseUnit: 'kg', minStockAlert: 1000 }, store: { name: 'Mahiyanganaya Storage' }, quantityInBaseUnit: 2000, availableQuantity: 2000 },
-    { _id: '3', material: { name: 'Copper Wire', sku: 'CPR-001', baseUnit: 'm', minStockAlert: 500 }, store: { name: 'Anuradhapura Central' }, quantityInBaseUnit: 0, availableQuantity: 0 },
-    { _id: '4', material: { name: 'Wood Planks', sku: 'WD-001', baseUnit: 'pcs', minStockAlert: 50 }, store: { name: 'Kurunegala Hub' }, quantityInBaseUnit: 20, availableQuantity: 20 },
-  ];
-
-  const mockPredictions = [
-    { id: 1, name: 'Premium Steel Beams', sku: 'STL-BM-001', unit: 'ton', m1: 45, m2: 60, pred: 75, trend: 'up', pct: 25, reason: 'High demand from upcoming commercial site launches.' },
-    { id: 2, name: 'Industrial Cement Bags', sku: 'CMT-BG-050', unit: 'bag', m1: 1200, m2: 1100, pred: 950, trend: 'down', pct: -13, reason: 'Monsoon season expected to slow down concrete work.' },
-    { id: 3, name: 'Copper Wiring Bundle', sku: 'CPR-WR-100', unit: 'roll', m1: 80, m2: 150, pred: 210, trend: 'up', pct: 40, reason: 'Surge in interior finishing phases across projects.' },
-    { id: 4, name: 'Ceramic Floor Tiles', sku: 'CER-TL-800', unit: 'box', m1: 400, m2: 420, pred: 430, trend: 'stable', pct: 2, reason: 'Consistent baseline replacement and finishing rate.' }
-  ];
 
   const fetchDashboardData = async () => {
     try {
@@ -87,14 +85,13 @@ const InventoryDashboard = () => {
         setAllDeliveries(delRes?.success ? delRes.data : []);
         setStores(storesRes?.success ? storesRes.data : []);
       } else {
-        // Fallback to mock data if API is empty/404
-        setAllInventory(mockInventory);
+        setAllInventory([]);
         setAllTransactions([]);
         setAllDeliveries([]);
       }
     } catch (err) {
-      console.warn('API Error, using mock data');
-      setAllInventory(mockInventory);
+      console.warn('API Error, using empty arrays');
+      setAllInventory([]);
       setAllTransactions([]);
       setAllDeliveries([]);
     } finally {
@@ -222,7 +219,7 @@ const InventoryDashboard = () => {
             ))}
             
             {calendarDays.map((day, index) => {
-              const orders = day ? mockCalendarOrders[day] : null;
+              const orders = day ? calendarOrders[day] : null;
               const hasOrders = orders && orders.length > 0;
               const isToday = day === today.getDate();
               
@@ -315,6 +312,90 @@ const InventoryDashboard = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+      ) : activeTab === 'Analysis' ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <BarChart2 className="text-blue-600" /> 7-Day Transaction Analysis
+              </h2>
+              <p className="text-gray-500 text-sm mt-1">
+                Visualizing the volume of incoming stock (Stock In) vs outgoing stock (Stock Out) over the last 7 days.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-medium text-gray-600 whitespace-nowrap">Filter by Material:</label>
+              <select
+                value={selectedMaterialForAnalysis}
+                onChange={(e) => setSelectedMaterialForAnalysis(e.target.value)}
+                className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 min-w-[150px] transition"
+              >
+                <option value="All Materials">All Materials</option>
+                {Array.from(new Set([...allTransactions, ...allInventory].filter(item => item.material?.name).map(item => item.material.name))).sort().map(mat => (
+                  <option key={mat} value={mat}>{mat}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          <div className="h-96 w-full">
+            {(() => {
+              const data = [];
+              for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateString = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const dayStart = new Date(d.setHours(0,0,0,0));
+                const dayEnd = new Date(d.setHours(23,59,59,999));
+          
+                const stockIn = allTransactions.filter(tx => 
+                  tx.type === 'STOCK_IN' && 
+                  new Date(tx.createdAt) >= dayStart && 
+                  new Date(tx.createdAt) <= dayEnd &&
+                  (selectedMaterialForAnalysis === 'All Materials' || tx.material?.name === selectedMaterialForAnalysis)
+                ).reduce((sum, tx) => sum + (tx.convertedBaseQuantity || tx.quantity), 0);
+          
+                const stockOut = allTransactions.filter(tx => 
+                  tx.type === 'STOCK_OUT' && 
+                  new Date(tx.createdAt) >= dayStart && 
+                  new Date(tx.createdAt) <= dayEnd &&
+                  (selectedMaterialForAnalysis === 'All Materials' || tx.material?.name === selectedMaterialForAnalysis)
+                ).reduce((sum, tx) => sum + (tx.convertedBaseQuantity || tx.quantity), 0);
+          
+                data.push({
+                  name: dateString,
+                  'Stock In': stockIn,
+                  'Stock Out': stockOut
+                });
+              }
+
+              return (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={data}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#6B7280', fontSize: 12}} dx={-10} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)' }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                    <Line type="monotone" dataKey="Stock In" stroke="#10B981" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
+                    <Line type="monotone" dataKey="Stock Out" stroke="#EF4444" strokeWidth={3} dot={{r: 4, strokeWidth: 2}} activeDot={{r: 6}} />
+                  </LineChart>
+                </ResponsiveContainer>
+              );
+            })()}
           </div>
         </div>
       ) : (
@@ -469,9 +550,9 @@ const InventoryDashboard = () => {
 
       {/* Calendar Orders Modal */}
       {isCalendarModalOpen && selectedCalendarDate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div className="flex justify-between items-center px-2 py-1 text-sm border-b border-gray-100 bg-gray-50/50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md flex flex-col max-h-[80vh] overflow-hidden">
+            <div className="flex justify-between items-center px-4 py-3 text-sm border-b border-gray-100 bg-gray-50/50 shrink-0">
               <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
                 Orders on {monthName.split(' ')[0]} {selectedCalendarDate}, {currentYear}
               </h2>
@@ -480,9 +561,9 @@ const InventoryDashboard = () => {
               </button>
             </div>
             
-            <div className="p-3">
-              <div className="space-y-2">
-                {mockCalendarOrders[selectedCalendarDate]?.map(order => (
+            <div className="p-4 overflow-y-auto flex-1 min-h-0">
+              <div className="space-y-3">
+                {calendarOrders[selectedCalendarDate]?.map(order => (
                   <div key={order.id} className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition">
                     <div className="flex justify-between items-start mb-2">
                       <div>
@@ -507,7 +588,7 @@ const InventoryDashboard = () => {
               </div>
             </div>
             
-            <div className="px-2 py-1 text-sm border-t border-gray-100 flex justify-end">
+            <div className="px-4 py-3 text-sm border-t border-gray-100 flex justify-end shrink-0 bg-white">
               <button 
                 onClick={() => setIsCalendarModalOpen(false)}
                 className="px-5 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition font-medium"

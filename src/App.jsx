@@ -48,17 +48,10 @@ function App() {
         const outOfStock = res.data.filter(item => item.quantityInBaseUnit <= 0);
         setOutOfStockItems(outOfStock);
       } else {
-        // Fallback to mock if API fails/empty
-        setOutOfStockItems([
-          { _id: 'mock1', material: { name: 'Copper Wire', sku: 'CPR-001' } },
-          { _id: 'mock2', material: { name: 'Specialty Paint', sku: 'PNT-X99' } }
-        ]);
+        setOutOfStockItems([]);
       }
     } catch (err) {
-      setOutOfStockItems([
-        { _id: 'mock1', material: { name: 'Copper Wire', sku: 'CPR-001' } },
-        { _id: 'mock2', material: { name: 'Specialty Paint', sku: 'PNT-X99' } }
-      ]);
+      setOutOfStockItems([]);
     }
   };
 

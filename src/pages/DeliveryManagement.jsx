@@ -12,32 +12,7 @@ const DeliveryManagement = () => {
 
 
 
-  const mockAdminOrders = [
-    {
-      id: "ORD-9872",
-      customer: "Perera Hardware",
-      product: "Premium Steel Beams",
-      quantity: 2,
-      total: 499.98,
-      status: "Pending"
-    },
-    {
-      id: "ORD-9873",
-      customer: "Silva Workshop",
-      product: "Copper Wiring Bundle",
-      quantity: 5,
-      total: 21.25,
-      status: "Processing"
-    },
-    {
-      id: "ORD-9874",
-      customer: "Colombo Construction",
-      product: "Cement Bags",
-      quantity: 100,
-      total: 1200.00,
-      status: "Shipped"
-    }
-  ];
+
 
   const fetchDeliveries = async () => {
     try {
