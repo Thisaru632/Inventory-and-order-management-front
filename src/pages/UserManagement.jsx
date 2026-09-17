@@ -21,7 +21,7 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/auth');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth`);
         if (response.data.success) {
           // Map MongoDB _id to id, add mock fields if missing (since DB might only have email and password for now)
           const mappedUsers = response.data.data.map(u => ({
@@ -104,7 +104,7 @@ const UserManagement = () => {
 
     try {
       if (editingUser) {
-        const res = await axios.put(`http://localhost:5000/api/auth/${editingUser.id}`, finalData);
+        const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/${editingUser.id}`, finalData);
         if (res.data.success) {
           const u = res.data.data;
           const mapped = {
@@ -113,7 +113,7 @@ const UserManagement = () => {
           setUsers(users.map(user => user.id === editingUser.id ? mapped : user));
         }
       } else {
-        const res = await axios.post('http://localhost:5000/api/auth', finalData);
+        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth`, finalData);
         if (res.data.success) {
           const u = res.data.data;
           const mapped = {
@@ -131,7 +131,7 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
-        const res = await axios.delete(`http://localhost:5000/api/auth/${id}`);
+        const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/auth/${id}`);
         if (res.data.success) {
           setUsers(users.filter(u => u.id !== id));
         }
