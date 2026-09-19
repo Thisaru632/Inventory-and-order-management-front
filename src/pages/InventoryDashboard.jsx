@@ -3,8 +3,11 @@ import { RefreshCcw, AlertTriangle, Package, Warehouse, TrendingDown, TrendingUp
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
+import { isSuperAdmin, getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const InventoryDashboard = () => {
+  const isSuper = isSuperAdmin();
+  const assignedWarehouse = getAssignedWarehouse();
   const [inventoryPreview, setInventoryPreview] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,7 +28,9 @@ const InventoryDashboard = () => {
   const [allDeliveries, setAllDeliveries] = useState([]);
   const [stores, setStores] = useState([]);
   const [activeTab, setActiveTab] = useState('Dashboard');
-  const [selectedLocation, setSelectedLocation] = useState('All Warehouses');
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    return assignedWarehouse || 'All Warehouses';
+  });
   const [selectedMaterialForAnalysis, setSelectedMaterialForAnalysis] = useState('All Materials');
   const tabs = ['Dashboard', 'Order Calendar', 'Future Predictions', 'Analysis'];
   
@@ -45,7 +50,12 @@ const InventoryDashboard = () => {
   for (let i = 1; i <= daysInMonth; i++) calendarDays.push(i);
 
   const calendarOrders = {};
-  allDeliveries.forEach(d => {
+  const activeLoc = assignedWarehouse || selectedLocation;
+  const deliveriesForCalendar = allDeliveries.filter(d => 
+    !activeLoc || activeLoc === 'All Warehouses' || matchesWarehouse(d.store?.name, activeLoc)
+  );
+
+  deliveriesForCalendar.forEach(d => {
     const dDate = new Date(d.scheduledDate || d.createdAt);
     if (dDate.getMonth() === currentMonth && dDate.getFullYear() === currentYear) {
       const day = dDate.getDate();
@@ -112,10 +122,12 @@ const InventoryDashboard = () => {
     let txs = allTransactions;
     let dels = allDeliveries;
 
-    if (selectedLocation !== 'All Warehouses') {
-      inv = inv.filter(item => item.store?.name === selectedLocation);
-      txs = txs.filter(tx => tx.store?.name === selectedLocation);
-      dels = dels.filter(d => d.store?.name === selectedLocation);
+    const currentLoc = assignedWarehouse || selectedLocation;
+
+    if (currentLoc && currentLoc !== 'All Warehouses') {
+      inv = inv.filter(item => matchesWarehouse(item.store?.name, currentLoc));
+      txs = txs.filter(tx => matchesWarehouse(tx.store?.name, currentLoc));
+      dels = dels.filter(d => matchesWarehouse(d.store?.name, currentLoc));
     }
 
     let low = 0;
@@ -182,19 +194,30 @@ const InventoryDashboard = () => {
           ))}
         </div>
 
-        {activeTab === 'Dashboard' && (
+        {(activeTab === 'Dashboard' || activeTab === 'Analysis') && (
           <div className="flex items-center gap-2 pr-2">
-            <label className="text-xs font-medium text-gray-600">Location:</label>
-            <select
-              value={selectedLocation}
-              onChange={(e) => setSelectedLocation(e.target.value)}
-              className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition"
-            >
-              <option value="All Warehouses">All Warehouses</option>
-              {stores.map(store => (
-                <option key={store._id} value={store.name}>{store.name}</option>
-              ))}
-            </select>
+            {assignedWarehouse ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-gray-500">Warehouse:</span>
+                <span className="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-md flex items-center gap-1.5 shadow-sm">
+                  <Warehouse size={14} className="text-blue-600" /> {assignedWarehouse}
+                </span>
+              </div>
+            ) : (
+              <>
+                <label className="text-xs font-medium text-gray-600">Location:</label>
+                <select
+                  value={selectedLocation}
+                  onChange={(e) => setSelectedLocation(e.target.value)}
+                  className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition"
+                >
+                  <option value="All Warehouses">All Warehouses</option>
+                  {stores.map(store => (
+                    <option key={store._id} value={store.name}>{store.name}</option>
+                  ))}
+                </select>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -318,9 +341,14 @@ const InventoryDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                <BarChart2 className="text-blue-600" /> 7-Day Transaction Analysis
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                  <BarChart2 className="text-blue-600" /> 7-Day Transaction Analysis
+                </h2>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                  {assignedWarehouse ? `Warehouse: ${assignedWarehouse}` : `Location: ${selectedLocation}`}
+                </span>
+              </div>
               <p className="text-gray-500 text-sm mt-1">
                 Visualizing the volume of incoming stock (Stock In) vs outgoing stock (Stock Out) over the last 7 days.
               </p>
@@ -333,7 +361,14 @@ const InventoryDashboard = () => {
                 className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 min-w-[150px] transition"
               >
                 <option value="All Materials">All Materials</option>
-                {Array.from(new Set([...allTransactions, ...allInventory].filter(item => item.material?.name).map(item => item.material.name))).sort().map(mat => (
+                {Array.from(new Set(
+                  [
+                    ...allTransactions.filter(tx => !activeLoc || activeLoc === 'All Warehouses' || matchesWarehouse(tx.store?.name, activeLoc)),
+                    ...allInventory.filter(item => !activeLoc || activeLoc === 'All Warehouses' || matchesWarehouse(item.store?.name, activeLoc))
+                  ]
+                  .filter(item => item.material?.name)
+                  .map(item => item.material.name)
+                )).sort().map(mat => (
                   <option key={mat} value={mat}>{mat}</option>
                 ))}
               </select>
@@ -342,6 +377,9 @@ const InventoryDashboard = () => {
           
           <div className="h-96 w-full">
             {(() => {
+              const analysisTxs = allTransactions.filter(tx => 
+                !activeLoc || activeLoc === 'All Warehouses' || matchesWarehouse(tx.store?.name, activeLoc)
+              );
               const data = [];
               for (let i = 6; i >= 0; i--) {
                 const d = new Date();
@@ -351,14 +389,14 @@ const InventoryDashboard = () => {
                 const dayStart = new Date(d.setHours(0,0,0,0));
                 const dayEnd = new Date(d.setHours(23,59,59,999));
           
-                const stockIn = allTransactions.filter(tx => 
+                const stockIn = analysisTxs.filter(tx => 
                   tx.type === 'STOCK_IN' && 
                   new Date(tx.createdAt) >= dayStart && 
                   new Date(tx.createdAt) <= dayEnd &&
                   (selectedMaterialForAnalysis === 'All Materials' || tx.material?.name === selectedMaterialForAnalysis)
                 ).reduce((sum, tx) => sum + (tx.convertedBaseQuantity || tx.quantity), 0);
           
-                const stockOut = allTransactions.filter(tx => 
+                const stockOut = analysisTxs.filter(tx => 
                   tx.type === 'STOCK_OUT' && 
                   new Date(tx.createdAt) >= dayStart && 
                   new Date(tx.createdAt) <= dayEnd &&

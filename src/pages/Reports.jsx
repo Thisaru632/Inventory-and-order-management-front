@@ -2,8 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { BarChart3, Package, CheckCircle, AlertTriangle, XCircle, Truck, Download, Calendar, Filter } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
+import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const Reports = () => {
+  const assignedWarehouse = getAssignedWarehouse();
   const [loading, setLoading] = useState(true);
   
   // Raw Data from DB
@@ -25,8 +27,14 @@ const Reports = () => {
         inventoryService.getMaterials()
       ]);
 
-      if (invRes.success) setInventories(invRes.data);
-      if (txRes.success) setDeliveries(txRes.data);
+      if (invRes.success) {
+        const data = invRes.data || [];
+        setInventories(assignedWarehouse ? data.filter(i => matchesWarehouse(i.store?.name, assignedWarehouse)) : data);
+      }
+      if (txRes.success) {
+        const data = txRes.data || [];
+        setDeliveries(assignedWarehouse ? data.filter(d => matchesWarehouse(d.store?.name, assignedWarehouse)) : data);
+      }
       if (matRes.success) setMaterials(matRes.data);
       
     } catch (error) {
@@ -149,6 +157,11 @@ const Reports = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <BarChart3 className="text-blue-600" /> Daily Stock Report
+            {assignedWarehouse && (
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                {assignedWarehouse}
+              </span>
+            )}
           </h1>
           <p className="text-gray-500 text-sm mt-1 flex items-center gap-1">
             <Calendar size={14} /> {today}

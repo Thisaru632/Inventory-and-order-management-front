@@ -1,12 +1,14 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 
+import { getAssignedWarehouse } from '../utils/auth';
+
 const API_URL = `${API_BASE_URL}/api/deliveries`;
 
 const getAuthParams = (params = {}) => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  if (user && user.role !== 'Super Admin' && user.warehouse && user.warehouse !== 'All Warehouses') {
-    return { ...params, warehouseName: user.warehouse };
+  const warehouse = getAssignedWarehouse();
+  if (warehouse) {
+    return { ...params, warehouseName: warehouse };
   }
   return params;
 };

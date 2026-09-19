@@ -3,8 +3,10 @@ import { RefreshCcw, AlertTriangle, Package, Warehouse, Edit, Trash2 } from 'luc
 import inventoryService from '../services/inventoryService';
 import StockTransactionModal from '../components/StockTransactionModal';
 import AddMaterialModal from '../components/AddMaterialModal';
+import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const InventoryList = () => {
+  const assignedWarehouse = getAssignedWarehouse();
   const [inventory, setInventory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +20,11 @@ const InventoryList = () => {
       setLoading(true);
       const res = await inventoryService.getStoreStock();
       if (res.success) {
-        setInventory(res.data);
+        const data = res.data || [];
+        const filtered = assignedWarehouse 
+          ? data.filter(item => matchesWarehouse(item.store?.name, assignedWarehouse))
+          : data;
+        setInventory(filtered);
       }
     } catch (err) {
       setError(err.message || 'Failed to fetch inventory');
@@ -51,7 +57,9 @@ const InventoryList = () => {
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <Package className="text-blue-600" /> Inventory Dashboard
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Manage stock across all locations</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {assignedWarehouse ? `Managing stock for ${assignedWarehouse}` : 'Manage stock across all locations'}
+          </p>
         </div>
         <div className="flex gap-3">
           <button 

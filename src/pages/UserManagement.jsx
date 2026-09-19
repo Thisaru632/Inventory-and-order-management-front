@@ -4,6 +4,7 @@ import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check } from 'lucide-rea
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 import inventoryService from '../services/inventoryService';
+import { isSuperAdmin } from '../utils/auth';
 
 const availablePermissions = [
   { id: 'manage_inventory', label: 'Manage Inventory (Add/Edit/Delete)' },
@@ -13,6 +14,7 @@ const availablePermissions = [
 ];
 
 const UserManagement = () => {
+  const isSuper = isSuperAdmin();
   const [users, setUsers] = useState([]);
   const [warehouseList, setWarehouseList] = useState(['All Warehouses']);
   const [loading, setLoading] = useState(true);
@@ -70,6 +72,10 @@ const UserManagement = () => {
   });
 
   const handleOpenModal = (user = null) => {
+    if (!isSuper) {
+      alert('Only Super Admin is authorized to add or edit users.');
+      return;
+    }
     if (user) {
       setEditingUser(user);
       setFormData({
@@ -179,12 +185,18 @@ const UserManagement = () => {
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage system users, access control, and assignments</p>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
-        >
-          <Plus size={18} /> Add New User
-        </button>
+        {isSuper ? (
+          <button 
+            onClick={() => handleOpenModal()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
+          >
+            <Plus size={18} /> Add New User
+          </button>
+        ) : (
+          <span className="text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-md border border-amber-200 font-medium">
+            Super Admin Access Required
+          </span>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
@@ -256,23 +268,27 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td className="px-2 py-1 text-sm text-right">
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => handleOpenModal(user)}
-                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                          title="Edit User"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(user.id)}
-                          className={`p-1.5 rounded transition ${user.role === 'Super Admin' ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-red-600 hover:bg-red-50'}`}
-                          title={user.role === 'Super Admin' ? "Cannot delete Super Admin" : "Delete User"}
-                          disabled={user.role === 'Super Admin'}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      {isSuper ? (
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleOpenModal(user)}
+                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
+                            title="Edit User"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(user.id)}
+                            className={`p-1.5 rounded transition ${user.role === 'Super Admin' ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-red-600 hover:bg-red-50'}`}
+                            title={user.role === 'Super Admin' ? "Cannot delete Super Admin" : "Delete User"}
+                            disabled={user.role === 'Super Admin'}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">View Only</span>
+                      )}
                     </td>
                   </tr>
                 ))

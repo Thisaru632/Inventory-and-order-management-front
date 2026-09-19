@@ -13,6 +13,8 @@ import Login from './pages/Login';
 import { LayoutDashboard, History, List, Truck, Users, ChevronDown, ChevronRight, ShoppingBag, Package, UserCog, BarChart3, Building, Bell, AlertCircle, LogOut } from 'lucide-react';
 import inventoryService from './services/inventoryService';
 
+import { isSuperAdmin, getAssignedWarehouse, matchesWarehouse } from './utils/auth';
+
 function App() {
   const [isCustomerPortalOpen, setIsCustomerPortalOpen] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -26,6 +28,9 @@ function App() {
     const savedUser = localStorage.getItem('user');
     return savedUser ? JSON.parse(savedUser) : null;
   });
+
+  const isSuper = isSuperAdmin(user);
+  const assignedWarehouse = getAssignedWarehouse(user);
 
   const handleLogin = (userData) => {
     setIsAuthenticated(true);
@@ -45,7 +50,11 @@ function App() {
     try {
       const res = await inventoryService.getStoreStock();
       if (res.success && res.data && res.data.length > 0) {
-        const outOfStock = res.data.filter(item => item.quantityInBaseUnit <= 0);
+        let stock = res.data;
+        if (assignedWarehouse) {
+          stock = stock.filter(item => matchesWarehouse(item.store?.name, assignedWarehouse));
+        }
+        const outOfStock = stock.filter(item => item.quantityInBaseUnit <= 0);
         setOutOfStockItems(outOfStock);
       } else {
         setOutOfStockItems([]);
@@ -61,7 +70,7 @@ function App() {
       window.addEventListener('inventory-updated', checkStockAlerts);
       return () => window.removeEventListener('inventory-updated', checkStockAlerts);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, assignedWarehouse]);
 
   if (!isAuthenticated) {
     return <Login onLogin={handleLogin} />;
@@ -140,19 +149,21 @@ function App() {
               )}
             </div>
             
-            {/* User Management */}
-            <Link 
-              to="/users" 
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-            >
-              <UserCog size={18} />
-              User Management
-            </Link>
+            {/* User Management - Super Admin Only */}
+            {isSuper && (
+              <Link 
+                to="/users" 
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
+              >
+                <UserCog size={18} />
+                User Management
+              </Link>
+            )}
             
             {/* Reports */}
             <Link 
-              to="/reports" 
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
+                to="/reports" 
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
             >
               <BarChart3 size={18} />
               Reports
@@ -223,7 +234,13 @@ function App() {
                 )}
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden sm:block">
+                  <div className="text-sm font-semibold text-gray-800">{user?.name || user?.email?.split('@')[0]}</div>
+                  <div className="text-xs text-blue-600 font-medium">
+                    {isSuper ? 'Super Admin (All Warehouses)' : `${user?.role || 'Admin'} • ${assignedWarehouse || 'All Warehouses'}`}
+                  </div>
+                </div>
                 <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm" title={user?.name}>
                   {user?.name ? user.name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'A')}
                 </div>

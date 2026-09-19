@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCcw, Truck, MapPin, CheckCircle, XCircle } from 'lucide-react';
 import deliveryService from '../services/deliveryService';
+import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const DeliveryManagement = () => {
+  const assignedWarehouse = getAssignedWarehouse();
   const [deliveries, setDeliveries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +21,11 @@ const DeliveryManagement = () => {
       setLoading(true);
       const res = await deliveryService.getDeliveries();
       if (res.success) {
-        setDeliveries(res.data);
+        const data = res.data || [];
+        const filtered = assignedWarehouse 
+          ? data.filter(d => matchesWarehouse(d.store?.name, assignedWarehouse))
+          : data;
+        setDeliveries(filtered);
       }
     } catch (err) {
       console.warn("API Error:", err.message);
@@ -68,7 +74,9 @@ const DeliveryManagement = () => {
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <Truck className="text-blue-600" /> Order and Delivery Management
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Dispatch stock to customer shops</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {assignedWarehouse ? `Dispatching and orders for ${assignedWarehouse}` : 'Dispatch stock to customer shops'}
+          </p>
         </div>
         <div className="flex gap-3">
           <button 

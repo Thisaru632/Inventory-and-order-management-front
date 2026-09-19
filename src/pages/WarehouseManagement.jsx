@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Plus, Edit2, Trash2, MapPin, X } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
+import { isSuperAdmin, getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const WarehouseManagement = () => {
+  const isSuper = isSuperAdmin();
+  const assignedWarehouse = getAssignedWarehouse();
   const [warehouses, setWarehouses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingWarehouse, setEditingWarehouse] = useState(null);
@@ -30,6 +33,10 @@ const WarehouseManagement = () => {
   }, []);
 
   const handleOpenModal = (warehouse = null) => {
+    if (!isSuper) {
+      alert('Only Super Admin is authorized to add or edit warehouses.');
+      return;
+    }
     if (warehouse) {
       setEditingWarehouse(warehouse);
       setFormData({
@@ -112,12 +119,18 @@ const WarehouseManagement = () => {
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage physical store locations and capacities</p>
         </div>
-        <button 
-          onClick={() => handleOpenModal()}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
-        >
-          <Plus size={18} /> Add Warehouse
-        </button>
+        {isSuper ? (
+          <button 
+            onClick={() => handleOpenModal()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
+          >
+            <Plus size={18} /> Add Warehouse
+          </button>
+        ) : (
+          <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md border border-blue-200 font-medium">
+            Assigned: {assignedWarehouse || 'All Warehouses'}
+          </span>
+        )}
       </div>
 
       <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
@@ -137,11 +150,13 @@ const WarehouseManagement = () => {
               {warehouses.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
-                    No warehouses found. Click "Add Warehouse" to create one.
+                    No warehouses found.
                   </td>
                 </tr>
               ) : (
-                warehouses.map((warehouse) => (
+                warehouses
+                  .filter(w => !assignedWarehouse || matchesWarehouse(w.name, assignedWarehouse))
+                  .map((warehouse) => (
                   <tr key={warehouse._id} className="hover:bg-gray-50/50 transition">
                     <td className="px-2 py-1 text-sm">
                       {warehouse.image ? (
@@ -169,22 +184,26 @@ const WarehouseManagement = () => {
                       </span>
                     </td>
                     <td className="px-2 py-1 text-sm text-right">
-                      <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => handleOpenModal(warehouse)}
-                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                          title="Edit"
-                        >
-                          <Edit2 size={16} />
-                        </button>
-                        <button 
-                          onClick={() => handleDelete(warehouse._id)}
-                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      {isSuper ? (
+                        <div className="flex justify-end gap-2">
+                          <button 
+                            onClick={() => handleOpenModal(warehouse)}
+                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
+                            title="Edit"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button 
+                            onClick={() => handleDelete(warehouse._id)}
+                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">View Only</span>
+                      )}
                     </td>
                   </tr>
                 ))

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowDownCircle, ArrowUpCircle, RefreshCcw, Activity, Calendar } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
+import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const TransactionAuditLog = () => {
+  const assignedWarehouse = getAssignedWarehouse();
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +15,11 @@ const TransactionAuditLog = () => {
         setLoading(true);
         const res = await inventoryService.getTransactionHistory({ limit: 50 });
         if (res.success) {
-          setTransactions(res.data);
+          const data = res.data || [];
+          const filtered = assignedWarehouse 
+            ? data.filter(tx => matchesWarehouse(tx.store?.name, assignedWarehouse))
+            : data;
+          setTransactions(filtered);
         }
       } catch (err) {
         setError(err.message || 'Failed to fetch transaction history');
@@ -61,7 +67,9 @@ const TransactionAuditLog = () => {
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Transaction Audit Log</h1>
-          <p className="text-gray-500 text-sm mt-1">Immutable ledger of all stock movements</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {assignedWarehouse ? `Immutable ledger of stock movements for ${assignedWarehouse}` : 'Immutable ledger of all stock movements'}
+          </p>
         </div>
       </div>
 

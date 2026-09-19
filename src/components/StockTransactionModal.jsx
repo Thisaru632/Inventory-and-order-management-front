@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { X, ArrowDownCircle, ArrowUpCircle, RefreshCcw, Activity, AlertTriangle } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
+import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK_IN', initialData = {} }) => {
+  const assignedWarehouse = getAssignedWarehouse();
   const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
@@ -25,7 +27,15 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
           inventoryService.getMaterials(),
           inventoryService.getSuppliers()
         ]);
-        if (storesRes.success) setStores(storesRes.data);
+        if (storesRes.success) {
+          setStores(storesRes.data);
+          if (assignedWarehouse) {
+            const matched = storesRes.data.find(s => matchesWarehouse(s.name, assignedWarehouse));
+            if (matched) {
+              setFormData(prev => ({ ...prev, storeId: matched._id }));
+            }
+          }
+        }
         if (materialsRes.success) setMaterials(materialsRes.data);
         if (suppliersRes.success) setSuppliers(suppliersRes.data);
       } catch (err) {
@@ -33,7 +43,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
       }
     };
     fetchMasterData();
-  }, [isOpen]);
+  }, [isOpen, assignedWarehouse]);
 
   const [formData, setFormData] = useState({
     storeId: initialData.storeId || '',
@@ -171,10 +181,13 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 required
                 value={formData.storeId}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={Boolean(assignedWarehouse)}
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-700"
               >
-                <option value="">Select a Store</option>
-                {stores.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                {!assignedWarehouse && <option value="">Select a Store</option>}
+                {stores
+                  .filter(s => !assignedWarehouse || matchesWarehouse(s.name, assignedWarehouse))
+                  .map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
               </select>
             </div>
             <div className="space-y-1 text-left">
