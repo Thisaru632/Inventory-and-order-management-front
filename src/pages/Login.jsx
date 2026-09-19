@@ -25,7 +25,11 @@ const Login = ({ onLogin }) => {
         setError(data?.message || 'Login failed. Please check your email and password.');
       }
     } catch (err) {
-      setError('Cannot connect to server. Please ensure the backend is running on port 5000.');
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:' && API_BASE_URL.includes('localhost')) {
+        setError('Cannot connect to server. This live website is trying to connect to local "http://localhost:5000". Please configure VITE_API_URL in your hosting platform with your deployed backend URL.');
+      } else {
+        setError(`Cannot connect to server at ${API_BASE_URL}. Please ensure the backend is running and accessible.`);
+      }
     } finally {
       setLoading(false);
     }
