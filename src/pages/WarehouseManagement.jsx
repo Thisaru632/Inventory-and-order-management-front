@@ -10,7 +10,8 @@ const WarehouseManagement = () => {
     name: '',
     location: '',
     capacity: '',
-    status: 'Active'
+    status: 'Active',
+    image: ''
   });
 
   const fetchWarehouses = async () => {
@@ -36,13 +37,25 @@ const WarehouseManagement = () => {
         location: warehouse.address || '',
         capacity: warehouse.capacity || '',
         status: warehouse.isActive ? 'Active' : 'Closed',
-        code: warehouse.code
+        code: warehouse.code,
+        image: warehouse.image || ''
       });
     } else {
       setEditingWarehouse(null);
-      setFormData({ name: '', location: '', capacity: '', status: 'Active' });
+      setFormData({ name: '', location: '', capacity: '', status: 'Active', image: '' });
     }
     setIsModalOpen(true);
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, image: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleCloseModal = () => {
@@ -63,6 +76,7 @@ const WarehouseManagement = () => {
         code: formData.code || formData.name.substring(0, 3).toUpperCase() + Date.now().toString().slice(-4),
         address: formData.location,
         capacity: formData.capacity,
+        image: formData.image || '',
         isActive: formData.status === 'Active'
       };
 
@@ -111,6 +125,7 @@ const WarehouseManagement = () => {
           <table className="w-full text-left text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-2 py-1 text-sm font-semibold text-gray-700">Image</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Warehouse Name</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Location</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Capacity</th>
@@ -128,6 +143,19 @@ const WarehouseManagement = () => {
               ) : (
                 warehouses.map((warehouse) => (
                   <tr key={warehouse._id} className="hover:bg-gray-50/50 transition">
+                    <td className="px-2 py-1 text-sm">
+                      {warehouse.image ? (
+                        <img 
+                          src={warehouse.image} 
+                          alt={warehouse.name} 
+                          className="w-10 h-10 rounded-md object-cover border border-gray-200 shadow-sm"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                          <Building size={18} />
+                        </div>
+                      )}
+                    </td>
                     <td className="px-2 py-1 text-xs font-medium text-gray-900">{warehouse.name}</td>
                     <td className="px-2 py-1 text-sm text-gray-600 flex items-center gap-1">
                       <MapPin size={14} className="text-gray-400" />
@@ -230,6 +258,33 @@ const WarehouseManagement = () => {
                   <option value="Maintenance">Maintenance</option>
                   <option value="Closed">Closed</option>
                 </select>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-medium text-gray-700">Warehouse Image</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                />
+                {formData.image && (
+                  <div className="mt-2 relative inline-block">
+                    <img 
+                      src={formData.image} 
+                      alt="Warehouse Preview" 
+                      className="h-16 w-24 object-cover rounded border border-gray-200 shadow-sm" 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, image: '' }))}
+                      className="absolute -top-1.5 -right-1.5 bg-red-600 text-white rounded-full p-0.5 shadow hover:bg-red-700 transition"
+                      title="Remove image"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 flex justify-end gap-3 border-t border-gray-100 mt-6">

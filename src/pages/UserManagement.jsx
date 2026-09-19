@@ -3,6 +3,7 @@ import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check } from 'lucide-rea
 
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
+import inventoryService from '../services/inventoryService';
 
 const availablePermissions = [
   { id: 'manage_inventory', label: 'Manage Inventory (Add/Edit/Delete)' },
@@ -11,10 +12,9 @@ const availablePermissions = [
   { id: 'view_inventory', label: 'View Inventory Only' }
 ];
 
-const warehouses = ['All Warehouses', 'Anuradhapura Central', 'Mahiyanganaya Storage', 'Kurunegala Hub'];
-
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
+  const [warehouseList, setWarehouseList] = useState(['All Warehouses']);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -24,15 +24,15 @@ const UserManagement = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/auth`);
         if (response.data.success) {
-          // Map MongoDB _id to id, add mock fields if missing (since DB might only have email and password for now)
+          // Map MongoDB _id to id, add mock fields if missing
           const mappedUsers = response.data.data.map(u => ({
             id: u._id,
             name: u.name || u.email.split('@')[0], // Fallback name
             email: u.email,
             role: u.role === 'superadmin' ? 'Super Admin' : (u.role || 'Admin'),
             permissions: u.permissions || ['all'],
-            warehouse: 'All Warehouses',
-            status: 'Active'
+            warehouse: u.warehouse || 'All Warehouses',
+            status: u.status || 'Active'
           }));
           setUsers(mappedUsers);
         }
@@ -42,8 +42,21 @@ const UserManagement = () => {
         setLoading(false);
       }
     };
+
+    const fetchWarehouses = async () => {
+      try {
+        const res = await inventoryService.getStores();
+        if (res.success && res.data) {
+          const names = res.data.map(s => s.name);
+          setWarehouseList(['All Warehouses', ...names]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch warehouses:', err);
+      }
+    };
     
     fetchUsers();
+    fetchWarehouses();
   }, []);
   
   const [formData, setFormData] = useState({
@@ -51,7 +64,7 @@ const UserManagement = () => {
     email: '',
     password: '',
     role: 'Admin',
-    warehouse: 'Anuradhapura Central',
+    warehouse: 'All Warehouses',
     status: 'Active',
     permissions: []
   });
@@ -62,6 +75,7 @@ const UserManagement = () => {
       setFormData({
         ...user,
         password: '',
+        warehouse: user.warehouse || 'All Warehouses',
         permissions: [...(user.permissions || [])]
       });
     } else {
@@ -71,7 +85,7 @@ const UserManagement = () => {
         email: '', 
         password: '', 
         role: 'Admin', 
-        warehouse: 'Anuradhapura Central', 
+        warehouse: warehouseList.length > 1 ? warehouseList[1] : 'All Warehouses', 
         status: 'Active', 
         permissions: ['view_inventory'] 
       });
@@ -351,7 +365,7 @@ const UserManagement = () => {
                       disabled={formData.role === 'Super Admin'}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                     >
-                      {warehouses.map(w => (
+                      {warehouseList.map(w => (
                         <option key={w} value={w}>{w}</option>
                       ))}
                     </select>
