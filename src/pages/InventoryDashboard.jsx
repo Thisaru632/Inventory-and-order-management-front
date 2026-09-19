@@ -27,6 +27,7 @@ const InventoryDashboard = () => {
   const [allTransactions, setAllTransactions] = useState([]);
   const [allDeliveries, setAllDeliveries] = useState([]);
   const [stores, setStores] = useState([]);
+
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [selectedLocation, setSelectedLocation] = useState(() => {
     return assignedWarehouse || 'All Warehouses';
@@ -501,13 +502,36 @@ const InventoryDashboard = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-start gap-3">
-              <div className="p-3 bg-red-50 text-red-600 rounded-lg">
-                <AlertCircle size={24} />
-              </div>
-              <div>
-                <p className="text-xs font-medium text-gray-500">Out of Stock</p>
-                <h3 className="text-2xl font-bold text-gray-800 mt-1">{metrics.outOfStock}</h3>
+            <div className={`bg-white rounded-xl shadow-sm border p-3 flex flex-col justify-between relative transition-all ${
+              metrics.outOfStock > 0 ? 'border-red-400 ring-2 ring-red-400/20' : 'border-gray-100'
+            }`}>
+              {/* Blinking Out of Stock Alert on top of the card */}
+              {metrics.outOfStock > 0 && (
+                <div className="mb-2 -mt-1 -mx-1 px-2.5 py-1 bg-red-600 text-white text-[11px] font-bold rounded-lg flex items-center justify-between shadow-sm animate-pulse">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-white animate-ping"></span>
+                    <span>{metrics.outOfStock} MATERIAL{metrics.outOfStock > 1 ? 'S' : ''} OUT OF STOCK!</span>
+                  </span>
+                  <span className="text-[10px] bg-red-800 px-1.5 py-0.5 rounded font-mono">ALERT</span>
+                </div>
+              )}
+              <div className="flex items-start gap-3">
+                <div className="p-3 bg-red-50 text-red-600 rounded-lg flex-shrink-0">
+                  <AlertCircle size={24} />
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-500">Out of Stock</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mt-1 flex items-center gap-2">
+                    <span className={metrics.outOfStock > 0 ? 'text-red-600 font-extrabold' : ''}>
+                      {metrics.outOfStock}
+                    </span>
+                    {metrics.outOfStock > 0 && (
+                      <span className="text-xs font-bold text-red-600 animate-pulse bg-red-50 px-2 py-0.5 rounded-full border border-red-200">
+                        Critical
+                      </span>
+                    )}
+                  </h3>
+                </div>
               </div>
             </div>
 

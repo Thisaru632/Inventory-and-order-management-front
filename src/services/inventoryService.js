@@ -5,6 +5,30 @@ import { getAssignedWarehouse } from '../utils/auth';
 
 const API_URL = `${API_BASE_URL}/api/inventory`;
 
+// Helper that executes request with automatic local backend fallback if remote returns 404
+const requestWithFallback = async (method, path, data = null, config = {}) => {
+  const url = `${API_BASE_URL}${path}`;
+  try {
+    if (method === 'get') return (await axios.get(url, config)).data;
+    if (method === 'post') return (await axios.post(url, data, config)).data;
+    if (method === 'put') return (await axios.put(url, data, config)).data;
+    if (method === 'delete') return (await axios.delete(url, config)).data;
+  } catch (err) {
+    if ((err.response?.status === 404 || !err.response) && !API_BASE_URL.includes('localhost') && !API_BASE_URL.includes('127.0.0.1')) {
+      try {
+        const localUrl = `http://localhost:5000${path}`;
+        if (method === 'get') return (await axios.get(localUrl, config)).data;
+        if (method === 'post') return (await axios.post(localUrl, data, config)).data;
+        if (method === 'put') return (await axios.put(localUrl, data, config)).data;
+        if (method === 'delete') return (await axios.delete(localUrl, config)).data;
+      } catch (localErr) {
+        throw err;
+      }
+    }
+    throw err;
+  }
+};
+
 const getAuthParams = (params = {}) => {
   const warehouse = getAssignedWarehouse();
   if (warehouse) {
@@ -15,74 +39,68 @@ const getAuthParams = (params = {}) => {
 
 const getStoreStock = async (params = {}) => {
   const finalParams = getAuthParams(params);
-  const response = await axios.get(`${API_URL}/stock`, { params: finalParams });
-  return response.data;
+  return requestWithFallback('get', '/api/inventory/stock', null, { params: finalParams });
 };
 
 const getTransactionHistory = async (params = {}) => {
   const finalParams = getAuthParams(params);
-  const response = await axios.get(`${API_URL}/transactions`, { params: finalParams });
-  return response.data;
+  return requestWithFallback('get', '/api/inventory/transactions', null, { params: finalParams });
 };
 
 const recordStockIn = async (data) => {
-  const response = await axios.post(`${API_URL}/stock-in`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/inventory/stock-in', data);
 };
 
 const recordStockOut = async (data) => {
-  const response = await axios.post(`${API_URL}/stock-out`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/inventory/stock-out', data);
 };
 
 const recordReturn = async (data) => {
-  const response = await axios.post(`${API_URL}/return`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/inventory/return', data);
 };
 
 const recordAdjustment = async (data) => {
-  const response = await axios.post(`${API_URL}/adjustment`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/inventory/adjustment', data);
 };
 
 const deleteInventory = async (id) => {
-  const response = await axios.delete(`${API_URL}/${id}`);
-  return response.data;
+  return requestWithFallback('delete', `/api/inventory/${id}`);
 };
 
 const getStores = async () => {
-  const response = await axios.get(`${API_BASE_URL}/api/master-data/stores`);
-  return response.data;
+  return requestWithFallback('get', '/api/master-data/stores');
 };
 
 const createStore = async (data) => {
-  const response = await axios.post(`${API_BASE_URL}/api/master-data/stores`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/master-data/stores', data);
 };
 
 const updateStore = async (id, data) => {
-  const response = await axios.put(`${API_BASE_URL}/api/master-data/stores/${id}`, data);
-  return response.data;
+  return requestWithFallback('put', `/api/master-data/stores/${id}`, data);
 };
 
 const deleteStore = async (id) => {
-  const response = await axios.delete(`${API_BASE_URL}/api/master-data/stores/${id}`);
-  return response.data;
+  return requestWithFallback('delete', `/api/master-data/stores/${id}`);
 };
 
 const getMaterials = async () => {
-  const response = await axios.get(`${API_BASE_URL}/api/master-data/materials`);
-  return response.data;
+  return requestWithFallback('get', '/api/master-data/materials');
 };
 
 const createMaterial = async (data) => {
-  const response = await axios.post(`${API_BASE_URL}/api/master-data/materials`, data);
-  return response.data;
+  return requestWithFallback('post', '/api/master-data/materials', data);
+};
+
+const updateMaterial = async (id, data) => {
+  return requestWithFallback('put', `/api/master-data/materials/${id}`, data);
+};
+
+const deleteMaterial = async (id) => {
+  return requestWithFallback('delete', `/api/master-data/materials/${id}`);
 };
 
 const getSuppliers = async () => {
-  const response = await axios.get(`${API_BASE_URL}/api/master-data/suppliers`);
-  return response.data;
+  return requestWithFallback('get', '/api/master-data/suppliers');
 };
 
 export default {
@@ -99,5 +117,7 @@ export default {
   deleteStore,
   getMaterials,
   createMaterial,
+  updateMaterial,
+  deleteMaterial,
   getSuppliers,
 };

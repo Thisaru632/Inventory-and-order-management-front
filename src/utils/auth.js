@@ -20,6 +20,12 @@ export const isCustomer = (user = getCurrentUser()) => {
   return user.role.toString().toLowerCase().trim() === 'customer';
 };
 
+export const isAdmin = (user = getCurrentUser()) => {
+  if (!user || !user.role) return false;
+  const role = user.role.toString().toLowerCase().trim();
+  return role === 'admin' || isSuperAdmin(user);
+};
+
 export const getAssignedWarehouse = (user = getCurrentUser()) => {
   if (!user || isSuperAdmin(user)) return null;
   const warehouse = (user.warehouse || '').trim();

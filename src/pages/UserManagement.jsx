@@ -26,16 +26,18 @@ const UserManagement = () => {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/auth`);
         if (response.data.success) {
-          // Map MongoDB _id to id, add mock fields if missing
-          const mappedUsers = response.data.data.map(u => ({
-            id: u._id,
-            name: u.name || u.email.split('@')[0], // Fallback name
-            email: u.email,
-            role: u.role === 'superadmin' ? 'Super Admin' : (u.role || 'Admin'),
-            permissions: u.permissions || ['all'],
-            warehouse: u.warehouse || 'All Warehouses',
-            status: u.status || 'Active'
-          }));
+          // Map MongoDB _id to id, filter out customer users to keep User Management for internal staff
+          const mappedUsers = response.data.data
+            .filter(u => (u.role || '').toString().toLowerCase().trim() !== 'customer')
+            .map(u => ({
+              id: u._id,
+              name: u.name || u.email.split('@')[0], // Fallback name
+              email: u.email,
+              role: u.role === 'superadmin' ? 'Super Admin' : (u.role || 'Admin'),
+              permissions: u.permissions || ['all'],
+              warehouse: u.warehouse || 'All Warehouses',
+              status: u.status || 'Active'
+            }));
           setUsers(mappedUsers);
         }
       } catch (error) {

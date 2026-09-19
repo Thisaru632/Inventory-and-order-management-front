@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Filter, ShoppingBag, X } from 'lucide-react';
+import { ShoppingCart, Search, Filter, ShoppingBag, X, MapPin, Phone } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
 
@@ -10,10 +10,16 @@ const CustomerItemList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderQuantity, setOrderQuantity] = useState(1);
-  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-  const [customerShopName, setCustomerShopName] = useState('');
-  const [customerAddress, setCustomerAddress] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  // Auto-get logged in customer registration details
+  const currentUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem('user') || '{}');
+    } catch (e) {
+      return {};
+    }
+  })();
 
 
 
@@ -140,149 +146,132 @@ const CustomerItemList = () => {
           </div>
         )}
       </div>
-      {/* Order Modal */}
+      {/* Direct Order Modal (Automatically uses customer's registered details) */}
       {selectedProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden">
-            <div className="flex justify-between items-center px-2 py-1 text-sm border-b border-gray-100">
-              <h2 className="text-lg font-bold text-gray-800">Order Product</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden border border-gray-100">
+            <div className="flex justify-between items-center px-4 py-3 text-sm border-b border-gray-100 bg-gray-50/70">
+              <h2 className="text-base font-bold text-gray-900 flex items-center gap-2">
+                <ShoppingBag size={18} className="text-blue-600" /> Order Product
+              </h2>
               <button 
                 onClick={() => setSelectedProduct(null)} 
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition"
+                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
               >
-                <X size={20} />
+                <X size={18} />
               </button>
             </div>
-            <div className="p-3">
-              <div className="flex gap-3 mb-6">
-                <img src={selectedProduct.image} alt={selectedProduct.material?.name} className="w-20 h-20 object-cover rounded-lg" />
-                <div>
-                  <h3 className="font-bold text-gray-900">{selectedProduct.material?.name}</h3>
-                  <div className="flex gap-2 items-center mb-1">
-                    <div className="text-sm text-gray-500">SKU: {selectedProduct.material?.sku}</div>
+            
+            <div className="p-4 space-y-4">
+              <div className="flex gap-3">
+                <img src={selectedProduct.image} alt={selectedProduct.material?.name} className="w-16 h-16 object-cover rounded-xl border border-gray-100" />
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-gray-900 text-sm truncate">{selectedProduct.material?.name}</h3>
+                  <div className="flex gap-2 items-center mt-0.5">
+                    <span className="text-xs text-gray-500">SKU: {selectedProduct.material?.sku}</span>
                     {selectedProduct.store && (
-                      <div className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.2 rounded font-medium truncate">
                         {selectedProduct.store.name}
-                      </div>
+                      </span>
                     )}
                   </div>
-                  <div className="font-bold text-blue-600">Rs. {Number(selectedProduct.price).toLocaleString()} / {selectedProduct.material?.baseUnit}</div>
+                  <div className="font-bold text-blue-600 text-sm mt-1">Rs. {Number(selectedProduct.price).toLocaleString()} / {selectedProduct.material?.baseUnit}</div>
                 </div>
               </div>
               
-              <div className="mb-6">
-                <label className="block text-xs font-medium text-gray-700 mb-2">Select Quantity</label>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5">Select Quantity</label>
                 <div className="flex items-center gap-3">
                   <button 
                     onClick={() => setOrderQuantity(Math.max(1, orderQuantity - 1))}
-                    className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 font-bold text-gray-700"
                   >-</button>
                   <input 
                     type="number" 
                     value={orderQuantity}
-                    onChange={(e) => setOrderQuantity(Number(e.target.value))}
+                    onChange={(e) => setOrderQuantity(Math.max(1, Math.min(selectedProduct.availableQuantity, Number(e.target.value) || 1)))}
                     min="1"
                     max={selectedProduct.availableQuantity}
-                    className="w-20 text-center py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-20 text-center py-1.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-bold text-sm"
                   />
                   <button 
                     onClick={() => setOrderQuantity(Math.min(selectedProduct.availableQuantity, orderQuantity + 1))}
-                    className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                    className="w-9 h-9 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-gray-50 font-bold text-gray-700"
                   >+</button>
+                  <span className="text-xs text-gray-500">
+                    Max: {selectedProduct.availableQuantity} {selectedProduct.material?.baseUnit}
+                  </span>
                 </div>
-                <div className="text-xs text-gray-500 mt-2">Available: {selectedProduct.availableQuantity} {selectedProduct.material?.baseUnit}</div>
               </div>
 
-              <div className="border-t border-gray-100 pt-4 flex justify-between items-center mb-6">
-                <div className="text-gray-500">Total</div>
-                <div className="text-2xl font-bold text-gray-900">
+              {/* Delivery info pre-filled automatically from registration */}
+              <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-xs">
+                <div className="flex items-center gap-1.5 font-semibold text-blue-800 mb-1">
+                  <MapPin size={13} className="text-blue-600" />
+                  <span>Delivery Details (From Registration)</span>
+                </div>
+                <p className="font-bold text-gray-900">{currentUser.name || currentUser.email?.split('@')[0] || 'Customer'}</p>
+                <p className="text-gray-600 mt-0.5">{currentUser.address || 'Standard Registered Delivery'}</p>
+                {currentUser.phone && (
+                  <p className="text-gray-500 mt-0.5 flex items-center gap-1">
+                    <Phone size={11} /> {currentUser.phone}
+                  </p>
+                )}
+              </div>
+
+              <div className="border-t border-gray-100 pt-3 flex justify-between items-center">
+                <span className="text-xs text-gray-500 uppercase font-medium">Total Amount</span>
+                <span className="text-xl font-black text-gray-900">
                   Rs. {(selectedProduct.price * orderQuantity).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                </div>
+                </span>
               </div>
 
-              <button 
-                onClick={() => {
-                  const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
-                  if (savedUser.name && !customerShopName) setCustomerShopName(savedUser.name);
-                  if (savedUser.address && !customerAddress) setCustomerAddress(savedUser.address);
-                  setIsAddressModalOpen(true);
-                }}
-                className="w-full py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition"
-              >
-                Confirm Order
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="flex gap-2 pt-1">
+                <button 
+                  onClick={() => setSelectedProduct(null)}
+                  className="flex-1 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium text-sm hover:bg-gray-200 transition"
+                >
+                  Cancel
+                </button>
+                <button 
+                  disabled={isPlacingOrder}
+                  onClick={async () => {
+                    setIsPlacingOrder(true);
+                    try {
+                      const orderName = currentUser.name || currentUser.email?.split('@')[0] || 'Customer';
+                      const orderAddress = currentUser.address || 'Customer Registered Address';
 
-      {/* Address Modal */}
-      {isAddressModalOpen && selectedProduct && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-3">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Delivery Details</h2>
-            
-            <div className="space-y-2 mb-6">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Your Name / Shop Name</label>
-                <input 
-                  type="text" 
-                  value={customerShopName}
-                  onChange={(e) => setCustomerShopName(e.target.value)}
-                  className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="E.g., John Hardware"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-1">Delivery Address</label>
-                <textarea 
-                  value={customerAddress}
-                  onChange={(e) => setCustomerAddress(e.target.value)}
-                  rows="3"
-                  className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Enter full delivery address"
-                />
-              </div>
-            </div>
+                      const orderRes = await deliveryService.createDelivery({
+                        customerShopName: orderName,
+                        customerAddress: orderAddress,
+                        storeId: selectedProduct.store._id,
+                        materialId: selectedProduct.material._id,
+                        quantity: orderQuantity,
+                        unit: selectedProduct.material.baseUnit,
+                        status: 'PENDING',
+                        notes: 'Ordered via Customer Portal'
+                      });
+                      
+                      // Dispatch notification event for admins
+                      window.dispatchEvent(new CustomEvent('new-customer-order', { detail: orderRes?.data }));
+                      try {
+                        localStorage.setItem('last_customer_order_time', Date.now().toString());
+                      } catch (e) {}
 
-            <div className="flex gap-3">
-              <button 
-                onClick={() => setIsAddressModalOpen(false)}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
-              >
-                Cancel
-              </button>
-              <button 
-                disabled={isPlacingOrder || !customerShopName || !customerAddress}
-                onClick={async () => {
-                  setIsPlacingOrder(true);
-                  try {
-                    await deliveryService.createDelivery({
-                      customerShopName,
-                      customerAddress,
-                      storeId: selectedProduct.store._id,
-                      materialId: selectedProduct.material._id,
-                      quantity: orderQuantity,
-                      unit: selectedProduct.material.baseUnit,
-                      status: 'PENDING',
-                      notes: 'Ordered via Customer Portal'
-                    });
-                    alert('Order placed successfully!');
-                    setIsAddressModalOpen(false);
-                    setSelectedProduct(null);
-                    setCustomerShopName('');
-                    setCustomerAddress('');
-                    fetchProducts(); // refresh inventory
-                  } catch (err) {
-                    alert('Failed to place order: ' + (err.response?.data?.message || err.message));
-                  } finally {
-                    setIsPlacingOrder(false);
-                  }
-                }}
-                className="flex-1 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50"
-              >
-                {isPlacingOrder ? 'Saving...' : 'Save & Place Order'}
-              </button>
+                      alert('Order placed successfully!');
+                      setSelectedProduct(null);
+                      fetchProducts(); // refresh inventory
+                    } catch (err) {
+                      alert('Failed to place order: ' + (err.response?.data?.message || err.message));
+                    } finally {
+                      setIsPlacingOrder(false);
+                    }
+                  }}
+                  className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm hover:bg-blue-700 transition shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isPlacingOrder ? 'Placing...' : 'Place Order'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
