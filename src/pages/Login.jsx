@@ -25,16 +25,40 @@ const Login = ({ onLogin }) => {
         ? { name, email, password, phone, address }
         : { email, password };
 
-      const response = await fetch(endpoint, {
+      let response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
+      // Fallback if /api/auth/register route is not yet deployed on live server (404)
+      if (isSignUp && response.status === 404) {
+        response = await fetch(`${API_BASE_URL}/api/auth`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...payload, role: 'Customer', warehouse: 'All Warehouses' }),
+        });
+      }
+
       const data = await response.json().catch(() => null);
       
       if (response.ok && data?.success) {
-        onLogin(data.user);
+        if (data.user) {
+          onLogin(data.user);
+        } else {
+          // Auto sign in with credentials
+          const loginRes = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          });
+          const loginData = await loginRes.json().catch(() => null);
+          if (loginRes.ok && loginData?.success) {
+            onLogin({ phone, address, ...loginData.user });
+          } else {
+            onLogin({ phone, address, ...data.data, role: 'Customer' });
+          }
+        }
       } else {
         setError(data?.message || (isSignUp ? 'Registration failed. Please check your details.' : 'Login failed. Please check your email and password.'));
       }

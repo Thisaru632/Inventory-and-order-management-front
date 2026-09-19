@@ -34,7 +34,16 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
         payload.password = formData.password;
       }
 
-      const res = await axios.put(`${API_BASE_URL}/api/auth/profile/${user.id || user._id}`, payload);
+      let res;
+      try {
+        res = await axios.put(`${API_BASE_URL}/api/auth/profile/${user.id || user._id}`, payload);
+      } catch (err) {
+        if (err.response?.status === 404) {
+          res = await axios.put(`${API_BASE_URL}/api/auth/${user.id || user._id}`, payload);
+        } else {
+          throw err;
+        }
+      }
       if (res.data.success) {
         const updated = res.data.user || res.data.data;
         localStorage.setItem('user', JSON.stringify(updated));
