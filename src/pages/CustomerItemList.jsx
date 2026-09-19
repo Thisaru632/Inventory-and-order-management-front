@@ -202,6 +202,9 @@ const CustomerItemList = () => {
 
               <button 
                 onClick={() => {
+                  const savedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                  if (savedUser.name && !customerShopName) setCustomerShopName(savedUser.name);
+                  if (savedUser.address && !customerAddress) setCustomerAddress(savedUser.address);
                   setIsAddressModalOpen(true);
                 }}
                 className="w-full py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition"

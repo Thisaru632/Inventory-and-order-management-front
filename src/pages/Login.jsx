@@ -2,8 +2,12 @@ import React, { useState } from 'react';
 import { API_BASE_URL } from '../config/api';
 
 const Login = ({ onLogin }) => {
+  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -11,18 +15,28 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      const endpoint = isSignUp 
+        ? `${API_BASE_URL}/api/auth/register` 
+        : `${API_BASE_URL}/api/auth/login`;
+
+      const payload = isSignUp 
+        ? { name, email, password, phone, address }
+        : { email, password };
+
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(payload),
       });
+
       const data = await response.json().catch(() => null);
       
       if (response.ok && data?.success) {
         onLogin(data.user);
       } else {
-        setError(data?.message || 'Login failed. Please check your email and password.');
+        setError(data?.message || (isSignUp ? 'Registration failed. Please check your details.' : 'Login failed. Please check your email and password.'));
       }
     } catch (err) {
       if (typeof window !== 'undefined' && window.location.protocol === 'https:' && API_BASE_URL.includes('localhost')) {
@@ -103,39 +117,99 @@ const Login = ({ onLogin }) => {
       </div>
 
       {/* Right Column (Light Side) */}
-      <div className="flex-1 bg-[#F9FAFB] flex flex-col justify-center items-center relative">
+      <div className="flex-1 bg-[#F9FAFB] flex flex-col justify-center items-center relative py-12">
         {/* Background Grid Pattern */}
         <div className="absolute inset-0 z-0 pointer-events-none opacity-50" style={{ backgroundImage: 'radial-gradient(#D1D5DB 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
         
-        <div className="w-full max-w-[360px] z-10 px-4">
-          <h2 className="text-[34px] font-bold text-gray-900 tracking-tight">Sign in</h2>
-          <p className="text-gray-500 text-sm mt-2 mb-10">Access your stock and delivery dashboard</p>
+        <div className="w-full max-w-[400px] z-10 px-6">
+          {/* Header Switcher */}
+          <div className="mb-6">
+            <h2 className="text-[30px] font-bold text-gray-900 tracking-tight">
+              {isSignUp ? 'Create Customer Account' : 'Sign in'}
+            </h2>
+            <p className="text-gray-500 text-sm mt-1">
+              {isSignUp 
+                ? 'Register to place orders and manage your customer profile' 
+                : 'Access your stock, orders, and delivery portal'}
+            </p>
+          </div>
 
-          {error && <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 p-3 rounded">{error}</div>}
+          {error && (
+            <div className="mb-4 text-sm text-red-600 bg-red-50 border border-red-100 p-3 rounded-lg leading-relaxed">
+              {error}
+            </div>
+          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-xs font-medium text-gray-600">Email</label>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Full Name *</label>
+                  <input 
+                    type="text" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    placeholder="e.g. Kamal Perera"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Phone Number *</label>
+                  <input 
+                    type="tel" 
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    placeholder="e.g. 0771234567"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-gray-700">Delivery Address *</label>
+                  <textarea 
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    rows={2}
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    placeholder="e.g. 45 Main Street, Mahiyanganaya"
+                    required
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-gray-700">
+                Email Address {isSignUp ? '(Used as Username) *' : ''}
+              </label>
               <input 
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
-                placeholder="you@toolink.com"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                placeholder="you@example.com"
                 required
               />
+              {isSignUp && (
+                <p className="text-[11px] text-gray-500">You will use this email address to log in.</p>
+              )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5">
               <div className="flex justify-between items-center">
-                <label className="text-xs font-medium text-gray-600">Password</label>
-                <a href="#" className="text-xs text-blue-600 hover:underline font-medium">Forgot password?</a>
+                <label className="text-xs font-semibold text-gray-700">Password *</label>
+                {!isSignUp && (
+                  <a href="#" className="text-xs text-blue-600 hover:underline font-medium">Forgot password?</a>
+                )}
               </div>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2.5 bg-white border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm tracking-widest font-mono"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm tracking-widest font-mono"
                 placeholder="••••••••"
                 required
               />
@@ -144,20 +218,43 @@ const Login = ({ onLogin }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-2.5 bg-[#3B71F3] hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors mt-2 shadow-sm"
+              className="w-full py-2.5 bg-[#3B71F3] hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-colors mt-2 shadow-sm"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading 
+                ? (isSignUp ? 'Creating Account...' : 'Signing in...') 
+                : (isSignUp ? 'Register & Sign In' : 'Sign in')}
             </button>
           </form>
 
-          <div className="mt-8 text-center">
-            <p className="text-[13px] text-gray-500">
-              New to Tool Link? <a href="#" className="font-semibold text-gray-900 underline decoration-gray-400 underline-offset-2">Request access</a>
-            </p>
+          {/* Toggle between Sign In and Sign Up */}
+          <div className="mt-6 pt-6 border-t border-gray-200 text-center">
+            {isSignUp ? (
+              <p className="text-sm text-gray-600">
+                Already have an account?{' '}
+                <button 
+                  type="button"
+                  onClick={() => { setIsSignUp(false); setError(''); }}
+                  className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                >
+                  Sign in
+                </button>
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600">
+                Are you a customer?{' '}
+                <button 
+                  type="button"
+                  onClick={() => { setIsSignUp(true); setError(''); }}
+                  className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                >
+                  Create customer account
+                </button>
+              </p>
+            )}
           </div>
         </div>
 
-        <div className="absolute bottom-10 left-10 z-10">
+        <div className="mt-8">
           <p className="text-xs text-gray-400 font-medium">© 2026 Tool Link</p>
         </div>
       </div>
