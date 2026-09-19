@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
-const API_URL = `${import.meta.env.VITE_API_URL}/api/inventory`;
+const API_URL = `${API_BASE_URL}/api/inventory`;
 
 const getAuthParams = (params = {}) => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -48,37 +49,37 @@ const deleteInventory = async (id) => {
 };
 
 const getStores = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/master-data/stores`);
+  const response = await axios.get(`${API_BASE_URL}/api/master-data/stores`);
   return response.data;
 };
 
 const createStore = async (data) => {
-  const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/master-data/stores`, data);
+  const response = await axios.post(`${API_BASE_URL}/api/master-data/stores`, data);
   return response.data;
 };
 
 const updateStore = async (id, data) => {
-  const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/master-data/stores/${id}`, data);
+  const response = await axios.put(`${API_BASE_URL}/api/master-data/stores/${id}`, data);
   return response.data;
 };
 
 const deleteStore = async (id) => {
-  const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/master-data/stores/${id}`);
+  const response = await axios.delete(`${API_BASE_URL}/api/master-data/stores/${id}`);
   return response.data;
 };
 
 const getMaterials = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/master-data/materials`);
+  const response = await axios.get(`${API_BASE_URL}/api/master-data/materials`);
   return response.data;
 };
 
 const createMaterial = async (data) => {
-  const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/master-data/materials`, data);
+  const response = await axios.post(`${API_BASE_URL}/api/master-data/materials`, data);
   return response.data;
 };
 
 const getSuppliers = async () => {
-  const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/master-data/suppliers`);
+  const response = await axios.get(`${API_BASE_URL}/api/master-data/suppliers`);
   return response.data;
 };
 

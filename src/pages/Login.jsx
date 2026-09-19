@@ -1,27 +1,33 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../config/api';
 
 const Login = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => null);
       
-      if (data.success) {
+      if (response.ok && data?.success) {
         onLogin(data.user);
       } else {
-        setError(data.message || 'Login failed');
+        setError(data?.message || 'Login failed. Please check your email and password.');
       }
     } catch (err) {
-      setError('Network error');
+      setError('Cannot connect to server. Please ensure the backend is running on port 5000.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -133,9 +139,10 @@ const Login = ({ onLogin }) => {
 
             <button 
               type="submit" 
-              className="w-full py-2.5 bg-[#3B71F3] hover:bg-blue-600 text-white rounded font-medium text-sm transition-colors mt-2 shadow-sm"
+              disabled={loading}
+              className="w-full py-2.5 bg-[#3B71F3] hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded font-medium text-sm transition-colors mt-2 shadow-sm"
             >
-              Sign in
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
 

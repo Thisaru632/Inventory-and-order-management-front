@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check } from 'lucide-react';
 
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 const availablePermissions = [
   { id: 'manage_inventory', label: 'Manage Inventory (Add/Edit/Delete)' },
@@ -21,15 +22,15 @@ const UserManagement = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/auth`);
+        const response = await axios.get(`${API_BASE_URL}/api/auth`);
         if (response.data.success) {
           // Map MongoDB _id to id, add mock fields if missing (since DB might only have email and password for now)
           const mappedUsers = response.data.data.map(u => ({
             id: u._id,
             name: u.name || u.email.split('@')[0], // Fallback name
             email: u.email,
-            role: u.role || 'Super Admin',
-            permissions: ['all'],
+            role: u.role === 'superadmin' ? 'Super Admin' : (u.role || 'Admin'),
+            permissions: u.permissions || ['all'],
             warehouse: 'All Warehouses',
             status: 'Active'
           }));
@@ -48,7 +49,8 @@ const UserManagement = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    role: 'Staff',
+    password: '',
+    role: 'Admin',
     warehouse: 'Anuradhapura Central',
     status: 'Active',
     permissions: []
@@ -59,11 +61,20 @@ const UserManagement = () => {
       setEditingUser(user);
       setFormData({
         ...user,
-        permissions: [...user.permissions]
+        password: '',
+        permissions: [...(user.permissions || [])]
       });
     } else {
       setEditingUser(null);
-      setFormData({ name: '', email: '', role: 'Staff', warehouse: 'Anuradhapura Central', status: 'Active', permissions: ['view_inventory'] });
+      setFormData({ 
+        name: '', 
+        email: '', 
+        password: '', 
+        role: 'Admin', 
+        warehouse: 'Anuradhapura Central', 
+        status: 'Active', 
+        permissions: ['view_inventory'] 
+      });
     }
     setIsModalOpen(true);
   };
@@ -102,9 +113,13 @@ const UserManagement = () => {
       finalData.warehouse = 'All Warehouses';
     }
 
+    if (editingUser && (!finalData.password || finalData.password.trim() === '')) {
+      delete finalData.password;
+    }
+
     try {
       if (editingUser) {
-        const res = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/${editingUser.id}`, finalData);
+        const res = await axios.put(`${API_BASE_URL}/api/auth/${editingUser.id}`, finalData);
         if (res.data.success) {
           const u = res.data.data;
           const mapped = {
@@ -113,7 +128,7 @@ const UserManagement = () => {
           setUsers(users.map(user => user.id === editingUser.id ? mapped : user));
         }
       } else {
-        const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth`, finalData);
+        const res = await axios.post(`${API_BASE_URL}/api/auth`, finalData);
         if (res.data.success) {
           const u = res.data.data;
           const mapped = {
@@ -131,7 +146,7 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
-        const res = await axios.delete(`${import.meta.env.VITE_API_URL}/api/auth/${id}`);
+        const res = await axios.delete(`${API_BASE_URL}/api/auth/${id}`);
         if (res.data.success) {
           setUsers(users.filter(u => u.id !== id));
         }
@@ -199,8 +214,20 @@ const UserManagement = () => {
                     </td>
                     <td className="px-2 py-1 text-sm">
                       <div className="flex items-center gap-1.5">
-                        {user.role === 'Super Admin' ? <Shield size={14} className="text-indigo-600" /> : <User size={14} className="text-gray-500" />}
-                        <span className={`font-medium ${user.role === 'Super Admin' ? 'text-indigo-600' : 'text-gray-700'}`}>
+                        {user.role === 'Super Admin' ? (
+                          <Shield size={14} className="text-indigo-600" />
+                        ) : user.role === 'Admin' ? (
+                          <Shield size={14} className="text-blue-600" />
+                        ) : (
+                          <User size={14} className="text-emerald-600" />
+                        )}
+                        <span className={`font-medium ${
+                          user.role === 'Super Admin' 
+                            ? 'text-indigo-600' 
+                            : user.role === 'Admin' 
+                            ? 'text-blue-600' 
+                            : 'text-emerald-700'
+                        }`}>
                           {user.role}
                         </span>
                       </div>
@@ -285,6 +312,21 @@ const UserManagement = () => {
                   </div>
                 </div>
 
+                <div className="space-y-1">
+                  <label className="text-xs font-medium text-gray-700">
+                    {editingUser ? 'Password (leave blank to keep current)' : 'Password *'}
+                  </label>
+                  <input 
+                    type="password" 
+                    name="password"
+                    required={!editingUser}
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder={editingUser ? "Leave blank to keep existing password" : "Enter password"}
+                  />
+                </div>
+
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1">
                     <label className="text-xs font-medium text-gray-700">Role</label>
@@ -294,9 +336,9 @@ const UserManagement = () => {
                       onChange={handleInputChange}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                     >
-                      <option value="Staff">Staff</option>
-                      <option value="Manager">Manager</option>
+                      <option value="Admin">Admin</option>
                       <option value="Super Admin">Super Admin</option>
+                      <option value="Customer">Customer</option>
                     </select>
                   </div>
 
