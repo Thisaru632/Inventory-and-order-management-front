@@ -113,6 +113,12 @@ function App() {
           orders = orders.filter(o => matchesWarehouse(o.store?.name, assignedWarehouse));
         }
 
+        // Only active incoming pending orders (do not display dispatched, delivered, or cancelled orders in notifications)
+        orders = orders.filter(o => {
+          const status = (o.status || 'PENDING').toUpperCase();
+          return status === 'PENDING';
+        });
+
         // Active un-dismissed notifications (status PENDING or new orders)
         const unreadOrders = orders.filter(o => !dismissedIds.includes(o._id));
 
@@ -129,6 +135,12 @@ function App() {
         } else {
           isInitialFetchRef.current = false;
         }
+
+        // Automatically close popup if the active order is no longer in pending notifications
+        setActiveOrderPopup(prev => {
+          if (!prev) return null;
+          return unreadOrders.some(o => o._id === prev._id) ? prev : null;
+        });
 
         unreadOrders.forEach(o => seenOrderIdsRef.current.add(o._id));
         setOrderNotifications(unreadOrders);
