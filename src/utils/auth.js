@@ -26,6 +26,11 @@ export const isAdmin = (user = getCurrentUser()) => {
   return role === 'admin' || isSuperAdmin(user);
 };
 
+export const isCashier = (user = getCurrentUser()) => {
+  if (!user || !user.role) return false;
+  return user.role.toString().toLowerCase().trim() === 'cashier';
+};
+
 export const getAssignedWarehouse = (user = getCurrentUser()) => {
   if (!user || isSuperAdmin(user)) return null;
   const warehouse = (user.warehouse || '').trim();

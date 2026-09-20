@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart3, Package, CheckCircle, AlertTriangle, XCircle, Truck, Download, Calendar, Filter } from 'lucide-react';
+import { BarChart3, Package, CheckCircle, AlertTriangle, XCircle, Truck, Download, Calendar, Filter, FileSpreadsheet } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
 import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
@@ -93,19 +94,25 @@ const Reports = () => {
 
     // Aggregate Deliveries
     filteredDeliveries.forEach(del => {
-      const matId = del.material?._id || del.material;
-      if (materialMap[matId]) {
-        materialMap[matId].orderCount += 1;
-        
-        if (del.status === 'DELIVERED' || del.status === 'DISPATCHED') {
-          materialMap[matId].deliveredOrderCount += 1;
-          materialMap[matId].deliveredUnitCount += del.quantity || 0;
-          materialMap[matId].deliveredUnitsCost += ((del.quantity || 0) * materialMap[matId].unitCost);
-          materialMap[matId].deliveredUnitsPrice += ((del.quantity || 0) * materialMap[matId].unitSellingPrice);
-        } else if (del.status === 'CANCELLED') {
-          materialMap[matId].cancelledOrderCount += 1;
+      const items = del.items && del.items.length > 0
+        ? del.items
+        : [{ material: del.material, quantity: del.quantity }];
+
+      items.forEach(it => {
+        const matId = it.material?._id || it.material;
+        if (materialMap[matId]) {
+          materialMap[matId].orderCount += 1;
+          
+          if (del.status === 'DELIVERED' || del.status === 'DISPATCHED') {
+            materialMap[matId].deliveredOrderCount += 1;
+            materialMap[matId].deliveredUnitCount += it.quantity || 0;
+            materialMap[matId].deliveredUnitsCost += ((it.quantity || 0) * materialMap[matId].unitCost);
+            materialMap[matId].deliveredUnitsPrice += ((it.quantity || 0) * materialMap[matId].unitSellingPrice);
+          } else if (del.status === 'CANCELLED') {
+            materialMap[matId].cancelledOrderCount += 1;
+          }
         }
-      }
+      });
     });
 
     let results = Object.values(materialMap);
@@ -151,14 +158,66 @@ const Reports = () => {
 
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+  const handleExportExcel = () => {
+    if (!processedData || processedData.length === 0) {
+      alert('No report data available to export.');
+      return;
+    }
+
+    // Prepare rows for Excel export
+    const excelRows = processedData.map((row) => ({
+      'Material Name': row.materialName,
+      'Available Stock': row.availableStock,
+      'Order Count': row.orderCount,
+      'Cancelled Orders': row.cancelledOrderCount,
+      'Dispatched Order Count': row.deliveredOrderCount,
+      'Dispatched Units': row.deliveredUnitCount,
+      'Order Cost (Rs)': Number((row.deliveredUnitsCost || 0).toFixed(2)),
+      'Order Price (Rs)': Number((row.deliveredUnitsPrice || 0).toFixed(2)),
+    }));
+
+    // Add Summary Row
+    excelRows.push({
+      'Material Name': 'TOTAL / SUMMARY',
+      'Available Stock': summary.totalAvailableStock,
+      'Order Count': summary.totalOrderCount,
+      'Cancelled Orders': summary.totalCancelledOrders,
+      'Dispatched Order Count': summary.totalDeliveredOrders,
+      'Dispatched Units': summary.totalDeliveredUnits,
+      'Order Cost (Rs)': Number((summary.totalOrderCost || 0).toFixed(2)),
+      'Order Price (Rs)': Number((summary.totalOrderPrice || 0).toFixed(2)),
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(excelRows);
+
+    // Set readable column widths
+    worksheet['!cols'] = [
+      { wch: 28 }, // Material Name
+      { wch: 16 }, // Available Stock
+      { wch: 14 }, // Order Count
+      { wch: 18 }, // Cancelled Orders
+      { wch: 22 }, // Dispatched Order Count
+      { wch: 16 }, // Dispatched Units
+      { wch: 18 }, // Order Cost (Rs)
+      { wch: 18 }, // Order Price (Rs)
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Daily Stock Report');
+
+    const dateSlug = new Date().toISOString().split('T')[0];
+    const fileName = `Stock_Report_${dateSlug}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
+  };
+
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <BarChart3 className="text-blue-600" /> Daily Stock Report
+            <BarChart3 className="text-emerald-600" /> Daily Stock Report
             {assignedWarehouse && (
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
                 {assignedWarehouse}
               </span>
             )}
@@ -207,8 +266,11 @@ const Reports = () => {
           >
             Refresh Data
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2 text-sm">
-            <Download size={16} /> Export PDF
+          <button 
+            onClick={handleExportExcel}
+            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium flex items-center gap-2 text-sm shadow-sm cursor-pointer"
+          >
+            <Download size={16} /> Export Excel
           </button>
         </div>
       </div>
@@ -235,7 +297,7 @@ const Reports = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col items-center text-center hover:shadow-md transition">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-full mb-3">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-full mb-3">
                 <Truck size={20} />
               </div>
               <p className="text-xs font-medium text-gray-500 mb-1">Dispatched Orders</p>
@@ -293,7 +355,7 @@ const Reports = () => {
                         <td className="px-6 py-4 text-center font-medium text-indigo-600">{row.availableStock}</td>
                         <td className="px-6 py-4 text-center text-gray-700">{row.orderCount}</td>
                         <td className="px-6 py-4 text-center text-red-500 font-medium">{row.cancelledOrderCount}</td>
-                        <td className="px-6 py-4 text-center text-blue-600">{row.deliveredOrderCount}</td>
+                        <td className="px-6 py-4 text-center text-emerald-700 font-semibold">{row.deliveredOrderCount}</td>
                         <td className="px-6 py-4 text-center font-medium text-gray-800">{row.deliveredUnitCount}</td>
                         <td className="px-6 py-4 text-right text-red-600 font-medium">
                           {row.deliveredUnitsCost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

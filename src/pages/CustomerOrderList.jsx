@@ -80,97 +80,121 @@ const CustomerOrderList = () => {
 
   const getStatusIcon = (status) => {
     switch(status) {
-      case 'Delivered': return <CheckCircle size={14} className="text-green-600" />;
-      case 'Shipped': return <Truck size={14} className="text-blue-600" />;
-      default: return <Clock size={14} className="text-yellow-600" />;
+      case 'Delivered': return <CheckCircle size={14} className="text-emerald-600" />;
+      case 'Shipped': return <Truck size={14} className="text-teal-600" />;
+      default: return <Clock size={14} className="text-amber-600" />;
     }
   };
 
   const getStatusBadge = (status) => {
     switch(status) {
-      case 'DELIVERED': return 'bg-green-100 text-green-800';
-      case 'DISPATCHED': return 'bg-blue-100 text-blue-800';
+      case 'DELIVERED': return 'bg-emerald-100 text-emerald-800';
+      case 'DISPATCHED': return 'bg-teal-100 text-teal-800';
       case 'CANCELLED': return 'bg-red-100 text-red-800';
-      default: return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-amber-100 text-amber-800';
     }
   };
 
   if (loading) return <div className="p-8 text-center text-gray-500">Loading your orders...</div>;
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
-      <div className="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <ShoppingBag className="text-blue-600" /> Order List
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">Track and manage your recent orders</p>
+    <div className="p-3 sm:p-5 max-w-7xl mx-auto space-y-3 sm:space-y-4">
+      <div className="flex justify-between items-center bg-white p-3 sm:p-4 rounded-xl shadow-xs border border-emerald-100">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 bg-gradient-to-tr from-emerald-600 to-teal-600 text-white rounded-xl shadow-xs">
+            <ShoppingBag size={18} />
+          </div>
+          <div>
+            <h1 className="text-base sm:text-lg font-bold text-gray-900 tracking-tight">Order List</h1>
+            <p className="text-gray-500 text-xs mt-0.5">Track and manage your orders</p>
+          </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+      <div className="bg-white rounded-xl shadow-xs overflow-hidden border border-emerald-200/80">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/90 border-b border-emerald-200 text-[11px] text-emerald-950 font-bold uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4 font-semibold text-gray-700">Order ID</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Order Date</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Delivery Date</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Product Details</th>
-                <th className="px-6 py-4 font-semibold text-gray-700">Status</th>
-                <th className="px-6 py-4 font-semibold text-gray-700 text-right">Actions</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950">Order ID</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950">Order Date</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950">Delivery Date</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950">Product Details</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950">Status</th>
+                <th className="px-3.5 py-2.5 font-bold text-emerald-950 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                  <td colSpan="6" className="px-4 py-8 text-center text-gray-500 text-xs">
                     No orders placed yet.
                   </td>
                 </tr>
               ) : (
                 orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50/50 transition">
-                    <td className="px-6 py-4 font-medium text-blue-600">DEL-{order._id.substring(order._id.length - 6).toUpperCase()}</td>
-                    <td className="px-6 py-4 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
-                    <td className="px-6 py-4">
+                  <tr key={order._id} className="hover:bg-emerald-50/30 transition">
+                    <td className="px-3.5 py-2.5 font-bold text-emerald-800 font-mono text-xs">DEL-{order._id.substring(order._id.length - 6).toUpperCase()}</td>
+                    <td className="px-3.5 py-2.5 text-gray-600">{new Date(order.createdAt).toLocaleDateString()}</td>
+                    <td className="px-3.5 py-2.5">
                       {order.scheduledDate ? (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
-                          <Calendar size={12} className="text-blue-500" />
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-xs">
+                          <Calendar size={11} className="text-emerald-600" />
                           {new Date(order.scheduledDate).toLocaleDateString()}
                         </div>
                       ) : (
-                        <span className="text-xs text-gray-400 italic">Not scheduled</span>
+                        <span className="text-[11px] text-gray-400 italic">Not scheduled</span>
                       )}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gray-100 rounded-lg">
-                          <Package size={16} className="text-gray-500" />
+                    <td className="px-3.5 py-2.5">
+                      {order.items && order.items.length > 1 ? (
+                        <div className="space-y-1.5">
+                          <div className="flex items-center gap-1.5">
+                            <div className="p-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md shrink-0">
+                              <Package size={13} />
+                            </div>
+                            <span className="text-xs font-bold text-emerald-900 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                              {order.items.length} Items in this Order
+                            </span>
+                          </div>
+                          <div className="space-y-1 pl-1">
+                            {order.items.map((it, idx) => (
+                              <div key={idx} className="flex justify-between items-center text-xs gap-3">
+                                <span className="font-medium text-gray-800 truncate max-w-[200px]">{it.material?.name || 'Material'}</span>
+                                <span className="text-emerald-700 font-bold shrink-0">{it.quantity} {it.unit}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        <div>
-                          <div className="font-medium text-gray-800">{order.material?.name || 'Unknown Material'}</div>
-                          <div className="text-xs text-gray-500">Qty: {order.quantity} {order.unit}</div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-lg shrink-0">
+                            <Package size={14} />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="font-bold text-gray-900 truncate">{order.material?.name || order.items?.[0]?.material?.name || 'Unknown Material'}</div>
+                            <div className="text-[11px] text-emerald-700 font-semibold">Qty: {order.quantity || order.items?.[0]?.quantity || 1} {order.unit || order.items?.[0]?.unit}</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${getStatusBadge(order.status)}`}>
+                    <td className="px-3.5 py-2.5">
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${getStatusBadge(order.status)}`}>
                         {getStatusIcon(order.status)}
                         {order.status}
                       </span>
                       {order.status === 'DELIVERED' && order.feedback && (order.feedback.productRating || order.feedback.sellerRating) ? (
-                        <div className="flex items-center gap-1 text-[11px] text-amber-600 font-semibold mt-1">
-                          <Star size={11} className="fill-amber-400 text-amber-500" />
-                          <span>Product: {order.feedback.productRating}/5 • Seller: {order.feedback.sellerRating}/5</span>
+                        <div className="flex items-center gap-1 text-[10px] text-amber-600 font-semibold mt-0.5">
+                          <Star size={10} className="fill-amber-400 text-amber-500" />
+                          <span>P: {order.feedback.productRating}/5 • S: {order.feedback.sellerRating}/5</span>
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-3.5 py-2.5 text-right">
                       {order.status === 'PENDING' && (
                         <button 
                           onClick={() => handleCancelOrder(order._id)}
-                          className="px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded transition"
+                          className="px-2.5 py-1 text-xs font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition"
                         >
                           Cancel
                         </button>
@@ -185,7 +209,7 @@ const CustomerOrderList = () => {
                             setHoverSellerRating(0);
                             setFeedbackComment('');
                           }}
-                          className="px-3 py-1.5 text-xs font-bold text-green-700 bg-green-100 hover:bg-green-200 rounded-lg transition shadow-sm inline-flex items-center gap-1"
+                          className="px-3.5 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl transition shadow-md shadow-emerald-500/20 inline-flex items-center gap-1.5"
                         >
                           <CheckCircle size={13} />
                           Received
@@ -241,7 +265,7 @@ const CustomerOrderList = () => {
                   <p className="text-xs text-gray-500">Qty: {feedbackModalOrder.quantity} {feedbackModalOrder.unit}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">
                     DEL-{feedbackModalOrder._id.substring(feedbackModalOrder._id.length - 6).toUpperCase()}
                   </span>
                   <p className="text-[11px] text-gray-400 mt-1">{feedbackModalOrder.store?.name || 'Warehouse'}</p>
@@ -282,13 +306,13 @@ const CustomerOrderList = () => {
               </div>
 
               {/* Seller & Delivery Star Rating */}
-              <div className="space-y-1.5 p-3 rounded-xl bg-blue-50/40 border border-blue-100">
+              <div className="space-y-1.5 p-3 rounded-xl bg-teal-50/40 border border-teal-100">
                 <div className="flex justify-between items-center">
                   <label className="text-xs font-bold text-gray-800 uppercase tracking-wide flex items-center gap-1.5">
-                    <Truck size={14} className="text-blue-500" />
+                    <Truck size={14} className="text-teal-600" />
                     Seller & Delivery Rating
                   </label>
-                  <span className="text-xs font-extrabold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-md">
+                  <span className="text-xs font-extrabold text-teal-700 bg-teal-100 px-2 py-0.5 rounded-md">
                     {hoverSellerRating || sellerRating} / 5 Stars
                   </span>
                 </div>
@@ -306,7 +330,7 @@ const CustomerOrderList = () => {
                       >
                         <Star 
                           size={26} 
-                          className={active ? 'fill-blue-500 text-blue-600 drop-shadow-sm' : 'text-gray-300'} 
+                          className={active ? 'fill-teal-500 text-teal-600 drop-shadow-sm' : 'text-gray-300'} 
                         />
                       </button>
                     );

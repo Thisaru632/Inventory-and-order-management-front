@@ -124,19 +124,19 @@ const WarehouseManagement = () => {
       <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <Building className="text-blue-600" /> Warehouse Management
+            <Building className="text-emerald-600" /> Warehouse Management
           </h1>
           <p className="text-gray-500 text-sm mt-1">Manage physical store locations and capacities</p>
         </div>
         {isSuper ? (
           <button 
             onClick={() => handleOpenModal()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium flex items-center gap-2 shadow-sm"
           >
             <Plus size={18} /> Add Warehouse
           </button>
         ) : (
-          <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md border border-blue-200 font-medium">
+          <span className="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-md border border-emerald-200 font-medium">
             Assigned Branch: {assignedWarehouse || 'All Warehouses'}
           </span>
         )}
@@ -175,7 +175,7 @@ const WarehouseManagement = () => {
                           className="w-10 h-10 rounded-md object-cover border border-gray-200 shadow-sm"
                         />
                       ) : (
-                        <div className="w-10 h-10 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100">
+                        <div className="w-10 h-10 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
                           <Building size={18} />
                         </div>
                       )}
@@ -197,7 +197,7 @@ const WarehouseManagement = () => {
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleOpenModal(warehouse)}
-                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
+                            className="p-1.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition"
                             title="Edit Branch Details"
                           >
                             <Edit2 size={16} />
@@ -247,7 +247,7 @@ const WarehouseManagement = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   disabled={!isSuper}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-600"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100 disabled:text-gray-600"
                   placeholder="e.g. North Wing Storage"
                 />
                 {!isSuper && (
@@ -263,7 +263,7 @@ const WarehouseManagement = () => {
                   required
                   value={formData.location}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="Address or area code"
                 />
               </div>
@@ -275,7 +275,7 @@ const WarehouseManagement = () => {
                   name="capacity"
                   value={formData.capacity}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   placeholder="e.g. 5,000 sq ft or 1000 pallets"
                 />
               </div>
@@ -286,7 +286,7 @@ const WarehouseManagement = () => {
                   name="status"
                   value={formData.status}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
                   <option value="Active">Active</option>
                   <option value="Maintenance">Maintenance</option>
@@ -300,7 +300,7 @@ const WarehouseManagement = () => {
                   type="file" 
                   accept="image/*"
                   onChange={handleImageUpload}
-                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                  className="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
                 />
                 {formData.image && (
                   <div className="mt-2 relative inline-block">
@@ -331,7 +331,7 @@ const WarehouseManagement = () => {
                 </button>
                 <button 
                   type="submit" 
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium shadow-sm"
                 >
                   {editingWarehouse ? 'Save Changes' : 'Create Warehouse'}
                 </button>

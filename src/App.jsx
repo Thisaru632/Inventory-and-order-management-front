@@ -11,13 +11,15 @@ import CustomerUserList from './pages/CustomerUserList';
 import Reports from './pages/Reports';
 import WarehouseManagement from './pages/WarehouseManagement';
 import TransactionAuditLog from './components/TransactionAuditLog';
+import CashierPortal from './pages/CashierPortal';
+import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
-import { LayoutDashboard, History, List, Truck, Users, ChevronDown, ChevronRight, ShoppingBag, Package, UserCog, BarChart3, Building, Bell, AlertCircle, LogOut, UserCheck, X, Check, AlertTriangle, Calendar } from 'lucide-react';
+import { LayoutDashboard, History, List, Truck, Users, ChevronDown, ChevronRight, ShoppingBag, Package, UserCog, BarChart3, Building, Bell, AlertCircle, LogOut, UserCheck, X, Check, AlertTriangle, Calendar, Receipt } from 'lucide-react';
 import inventoryService from './services/inventoryService';
 import deliveryService from './services/deliveryService';
 import { playOrderAlertSound } from './utils/sound';
 
-import { isSuperAdmin, isCustomer, isAdmin, getAssignedWarehouse, matchesWarehouse } from './utils/auth';
+import { isSuperAdmin, isCustomer, isAdmin, isCashier, getAssignedWarehouse, matchesWarehouse } from './utils/auth';
 
 function App() {
   const [isCustomerPortalOpen, setIsCustomerPortalOpen] = useState(false);
@@ -42,6 +44,7 @@ function App() {
 
   const isSuper = isSuperAdmin(user);
   const isCust = isCustomer(user);
+  const isCashierUser = isCashier(user);
   const isAdminUser = isSuper || isAdmin(user);
   const assignedWarehouse = getAssignedWarehouse(user);
 
@@ -55,6 +58,11 @@ function App() {
     try {
       sessionStorage.removeItem(`out_of_stock_popup_seen_${userKey}`);
     } catch (e) {}
+
+    // Cashier first screen must be Cashier Section (/cashier)
+    if (isCashier(userData)) {
+      window.history.replaceState(null, '', '/cashier');
+    }
   };
 
   const handleLogout = () => {
@@ -231,153 +239,21 @@ function App() {
   return (
     <Router>
       <div className="h-screen bg-gray-50 text-gray-900 font-sans flex overflow-hidden">
-        {/* Sidebar - Fixed Position */}
-        <div className="w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-screen sticky top-0 z-30">
-          <div className="h-16 flex items-center px-6 border-b border-gray-100 shrink-0">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              System Tool Link
-            </h1>
-          </div>
-          {/* Navigation */}
-          {isCust ? (
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-              <div className="px-3 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Customer Portal
-              </div>
-              <Link 
-                to="/customer/items" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <Package size={18} />
-                Product Catalog
-              </Link>
-              <Link 
-                to="/customer/orders" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <ShoppingBag size={18} />
-                My Orders
-              </Link>
-              <Link 
-                to="/customer/profile" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <UserCog size={18} />
-                My Profile
-              </Link>
-            </nav>
-          ) : (
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-              <Link 
-                to="/" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <LayoutDashboard size={18} />
-                Dashboard
-              </Link>
-              <Link 
-                to="/audit-log" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <History size={18} />
-                Audit Log
-              </Link>
-              <Link 
-                to="/inventory-list" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <List size={18} />
-                Inventory List
-              </Link>
-              <Link 
-                to="/deliveries" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <Truck size={18} />
-                Delivery and Order Manage
-              </Link>
-              
-              {/* Customer Portal Dropdown */}
-              <div className="pt-2">
-                <button 
-                  onClick={() => setIsCustomerPortalOpen(!isCustomerPortalOpen)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-                >
-                  <div className="flex items-center gap-3">
-                    <Users size={18} />
-                    Customer Portal
-                  </div>
-                  {isCustomerPortalOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                </button>
-                
-                {isCustomerPortalOpen && (
-                  <div className="pl-10 pr-3 mt-1 space-y-1">
-                    <Link 
-                      to="/customer/items" 
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition"
-                    >
-                      <Package size={16} />
-                      Item List
-                    </Link>
-                    <Link 
-                      to="/customer/orders" 
-                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-700 transition"
-                    >
-                      <ShoppingBag size={16} />
-                      Order List
-                    </Link>
-                  </div>
-                )}
-              </div>
-              
-              {/* User Management */}
-              {isAdminUser && (
-                <Link 
-                  to="/users" 
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-                >
-                  <UserCog size={18} />
-                  User Management
-                </Link>
-              )}
-
-              {/* Customer User List - Super Admin & Admin Only */}
-              {isAdminUser && (
-                <Link 
-                  to="/customer-users" 
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-                >
-                  <UserCheck size={18} />
-                  Customer User List
-                </Link>
-              )}
-              
-              {/* Reports */}
-              <Link 
-                  to="/reports" 
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <BarChart3 size={18} />
-                Reports
-              </Link>
-              
-              {/* Warehouse Management */}
-              <Link 
-                to="/warehouse" 
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
-              >
-                <Building size={18} />
-                Warehouse Management
-              </Link>
-            </nav>
-          )}
-        </div>
+        {/* Modern Sidebar */}
+        <Sidebar 
+          user={user}
+          onLogout={handleLogout}
+          orderNotifications={orderNotifications}
+          outOfStockItems={outOfStockItems}
+          isCustomerPortalOpen={isCustomerPortalOpen}
+          setIsCustomerPortalOpen={setIsCustomerPortalOpen}
+        />
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-          <header className="h-16 bg-white border-b border-gray-100 flex items-center px-6 shadow-sm z-20 shrink-0">
-            <div className="flex-1"></div>
-            <div className="flex items-center gap-6">
+          <header className="h-14 sm:h-16 bg-white border-b border-gray-100 flex items-center px-3 sm:px-6 shadow-sm z-20 shrink-0">
+            <div className="flex-1 min-w-0"></div>
+            <div className="flex items-center gap-2.5 sm:gap-6 shrink-0">
               
               {/* Notification Bell - Staff Only */}
               {!isCust && (
@@ -425,13 +301,13 @@ function App() {
                         {/* New Customer Orders Section */}
                         {orderNotifications.length > 0 && (
                           <div>
-                            <div className="px-4 py-1.5 bg-blue-50/70 text-[11px] font-semibold text-blue-700 uppercase tracking-wider flex items-center justify-between">
+                            <div className="px-4 py-1.5 bg-emerald-50/70 text-[11px] font-semibold text-emerald-800 uppercase tracking-wider flex items-center justify-between">
                               <span className="flex items-center gap-1.5">
-                                <ShoppingBag size={12} /> New Customer Orders
+                                <ShoppingBag size={12} className="text-emerald-600" /> New Customer Orders
                               </span>
                               <span className="flex h-2 w-2 relative">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                               </span>
                             </div>
 
@@ -439,9 +315,9 @@ function App() {
                               <div 
                                 key={order._id}
                                 onClick={() => handleOpenOrderNotification(order)}
-                                className="p-3.5 hover:bg-blue-50/30 transition cursor-pointer flex items-start gap-3 relative group"
+                                className="p-3.5 hover:bg-emerald-50/40 transition cursor-pointer flex items-start gap-3 relative group"
                               >
-                                <div className="mt-0.5 p-2 bg-blue-100 text-blue-700 rounded-xl flex-shrink-0 shadow-sm">
+                                <div className="mt-0.5 p-2 bg-emerald-100 text-emerald-700 rounded-xl flex-shrink-0 shadow-sm">
                                   <ShoppingBag size={16} />
                                 </div>
                                 <div className="flex-1 min-w-0 pr-6">
@@ -461,7 +337,7 @@ function App() {
                                       {order.store?.name || 'Warehouse'}
                                     </span>
                                     {order.scheduledDate && (
-                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded font-semibold border border-blue-100">
+                                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 bg-emerald-50 text-emerald-700 rounded font-semibold border border-emerald-100">
                                         <Calendar size={11} />
                                         {new Date(order.scheduledDate).toLocaleDateString()}
                                       </span>
@@ -471,7 +347,7 @@ function App() {
                                     )}
                                   </div>
                                   <div className="mt-1.5">
-                                    <span className="text-[11px] text-blue-600 font-semibold group-hover:underline">
+                                    <span className="text-[11px] text-emerald-700 font-semibold group-hover:underline">
                                       Open details &rarr;
                                     </span>
                                   </div>
@@ -533,7 +409,7 @@ function App() {
               <div className="flex items-center gap-3">
                 <div className="text-right hidden sm:block">
                   <div className="text-sm font-semibold text-gray-800">{user?.name || user?.email?.split('@')[0]}</div>
-                  <div className={`text-xs font-medium ${isCust ? 'text-emerald-600' : 'text-blue-600'}`}>
+                  <div className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 inline-block mt-0.5">
                     {isCust 
                       ? 'Customer Portal' 
                       : isSuper 
@@ -541,7 +417,7 @@ function App() {
                       : `${user?.role || 'Admin'} • ${assignedWarehouse || 'All Warehouses'}`}
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm" title={user?.name}>
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" title={user?.name}>
                   {user?.name ? user.name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'A')}
                 </div>
                 <button 
@@ -564,9 +440,18 @@ function App() {
                   <Route path="/customer/profile" element={<CustomerProfile user={user} onUpdateUser={(u) => setUser(u)} />} />
                   <Route path="*" element={<Navigate to="/customer/items" replace />} />
                 </>
+              ) : isCashierUser ? (
+                <>
+                  <Route path="/" element={<Navigate to="/cashier" replace />} />
+                  <Route path="/cashier" element={<CashierPortal />} />
+                  <Route path="/inventory-list" element={<InventoryList />} />
+                  <Route path="/deliveries" element={<DeliveryManagement />} />
+                  <Route path="*" element={<Navigate to="/cashier" replace />} />
+                </>
               ) : (
                 <>
                   <Route path="/" element={<InventoryDashboard />} />
+                  <Route path="/cashier" element={<CashierPortal />} />
                   <Route path="/inventory-list" element={<InventoryList />} />
                   <Route path="/deliveries" element={<DeliveryManagement />} />
                   <Route path="/audit-log" element={<TransactionAuditLog />} />
@@ -585,28 +470,28 @@ function App() {
         </div>
         {/* Real-time Incoming Order Popup Banner */}
         {activeOrderPopup && !isCust && (
-          <div className="fixed top-20 right-6 z-[95] w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border-2 border-blue-600 p-4 animate-in slide-in-from-top-6 duration-300">
+          <div className="fixed top-20 right-6 z-[95] w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border-2 border-emerald-500 p-4 animate-in slide-in-from-top-6 duration-300">
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0">
-                <div className="p-2.5 bg-blue-600 text-white rounded-xl shadow-md shadow-blue-500/30 flex-shrink-0 animate-bounce">
+                <div className="p-2.5 bg-gradient-to-tr from-emerald-600 to-teal-600 text-white rounded-xl shadow-md shadow-emerald-500/30 flex-shrink-0 animate-bounce">
                   <ShoppingBag size={20} />
                 </div>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <h4 className="text-sm font-bold text-gray-900">New Order Received!</h4>
                     <span className="flex h-2 w-2 relative">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
                     </span>
                   </div>
-                  <p className="text-xs font-bold text-blue-700 mt-0.5 truncate">
+                  <p className="text-xs font-bold text-emerald-700 mt-0.5 truncate">
                     {activeOrderPopup.customerShopName}
                   </p>
                   <p className="text-xs text-gray-700 mt-0.5 font-medium truncate">
-                    {activeOrderPopup.material?.name} × <span className="font-bold">{activeOrderPopup.quantity} {activeOrderPopup.unit}</span>
+                    {activeOrderPopup.material?.name || 'Item'} × {activeOrderPopup.quantity} {activeOrderPopup.unit}
                   </p>
-                  <div className="flex items-center gap-2 mt-1.5 text-[11px] text-gray-500">
-                    <span className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-700 font-semibold truncate">
+                  <div className="flex items-center gap-2 mt-1 text-[11px] text-gray-400 flex-wrap">
+                    <span className="inline-block px-1.5 py-0.2 bg-gray-100 text-gray-600 rounded font-medium">
                       {activeOrderPopup.store?.name || 'Warehouse'}
                     </span>
                     {activeOrderPopup.customerAddress && (
@@ -647,7 +532,7 @@ function App() {
                     setActiveOrderPopup(null);
                     handleOpenOrderNotification(ord);
                   }}
-                  className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-1.5"
+                  className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-xs font-bold rounded-lg shadow-sm transition flex items-center gap-1.5 cursor-pointer"
                 >
                   View Details &rarr;
                 </button>
@@ -662,7 +547,7 @@ function App() {
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100 animate-in fade-in zoom-in-95 duration-200">
               <div className="p-5 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-blue-100 text-blue-700 rounded-xl shadow-sm">
+                  <div className="p-2 bg-emerald-100 text-emerald-700 rounded-xl shadow-sm">
                     <ShoppingBag size={20} />
                   </div>
                   <div>
@@ -681,8 +566,8 @@ function App() {
               </div>
 
               <div className="p-6 space-y-4 text-sm">
-                <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-100">
-                  <span className="text-[11px] font-semibold text-blue-700 uppercase tracking-wider">Customer Information</span>
+                <div className="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-100">
+                  <span className="text-[11px] font-semibold text-emerald-700 uppercase tracking-wider">Customer Information</span>
                   <p className="text-base font-bold text-gray-900 mt-0.5">{selectedOrderModal.customerShopName}</p>
                   {selectedOrderModal.customerAddress && (
                     <p className="text-xs text-gray-600 mt-1">
@@ -700,7 +585,7 @@ function App() {
 
                   <div className="p-3 bg-gray-50 rounded-xl">
                     <p className="text-xs text-gray-400 uppercase font-medium">Quantity</p>
-                    <p className="text-lg font-bold text-blue-600 mt-0.5">
+                    <p className="text-lg font-bold text-emerald-700 mt-0.5">
                       {selectedOrderModal.quantity} {selectedOrderModal.unit}
                     </p>
                   </div>
@@ -721,12 +606,12 @@ function App() {
                 </div>
 
                 {selectedOrderModal.scheduledDate && (
-                  <div className="p-3 bg-blue-50/70 rounded-xl border border-blue-100 flex items-center justify-between">
+                  <div className="p-3 bg-emerald-50/70 rounded-xl border border-emerald-100 flex items-center justify-between">
                     <div>
-                      <p className="text-xs text-blue-600 uppercase font-bold tracking-wide">Delivery Date</p>
+                      <p className="text-xs text-emerald-700 uppercase font-bold tracking-wide">Delivery Date</p>
                       <p className="font-bold text-gray-900 mt-0.5">{new Date(selectedOrderModal.scheduledDate).toLocaleDateString()}</p>
                     </div>
-                    <Calendar size={20} className="text-blue-500" />
+                    <Calendar size={20} className="text-emerald-600" />
                   </div>
                 )}
 
@@ -744,7 +629,7 @@ function App() {
                     setSelectedOrderModal(null);
                     setIsNotificationOpen(false);
                   }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm shadow-sm transition"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-xl text-sm shadow-sm transition"
                 >
                   View in Deliveries
                 </Link>

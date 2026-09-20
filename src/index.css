@@ -4,10 +4,23 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  font-size: 13.5px;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   @apply antialiased text-gray-900 bg-gray-50;
   font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.85rem;
 }
+
+/* System-wide icon size reduction */
+svg.lucide {
+  scale: 0.85;
+  transform-origin: center;
+}
+
 
 @layer utilities {
   .animation-delay-2000 {
@@ -36,3 +49,20 @@ body {
 .animate-blob {
   animation: blob 7s infinite;
 }
+
+/* Custom Sleek Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.2);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(16, 185, 129, 0.45);
+}
+

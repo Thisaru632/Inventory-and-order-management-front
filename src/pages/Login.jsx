@@ -82,12 +82,12 @@ const Login = ({ onLogin }) => {
           <div className="flex items-center gap-2 mb-4 mt-4">
             <div className="flex items-center">
               {/* Logo icon */}
-              <div className="w-10 h-5 rounded-full border-[2.5px] border-[#3B71F3] bg-transparent flex items-center justify-center relative translate-x-2.5 z-10"></div>
+              <div className="w-10 h-5 rounded-full border-[2.5px] border-emerald-500 bg-transparent flex items-center justify-center relative translate-x-2.5 z-10"></div>
               <div className="w-10 h-5 rounded-full border-[2.5px] border-white bg-transparent relative -translate-x-2.5"></div>
             </div>
           </div>
           <h1 className="text-5xl font-bold tracking-tight mb-3 mt-8">Tool Link</h1>
-          <p className="text-gray-400 text-sm">Stock and delivery, tracked in real time</p>
+          <p className="text-emerald-200/70 text-sm">Stock and delivery, tracked in real time</p>
         </div>
 
         {/* Diagram Graphic */}
@@ -100,7 +100,7 @@ const Login = ({ onLogin }) => {
              
              {/* Warehouse */}
              <div className="absolute top-0 left-0 flex flex-col items-center">
-               <svg className="w-10 h-10 text-[#3B71F3]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <svg className="w-10 h-10 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                </svg>
                <span className="text-xs text-gray-400 mt-2">Warehouse</span>
@@ -117,7 +117,7 @@ const Login = ({ onLogin }) => {
 
              {/* Delivered */}
              <div className="absolute top-2 right-0 flex flex-col items-center">
-               <svg className="w-10 h-10 text-[#3B71F3]" viewBox="0 0 24 24" fill="currentColor">
+               <svg className="w-10 h-10 text-emerald-500" viewBox="0 0 24 24" fill="currentColor">
                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                </svg>
                <span className="text-xs text-gray-400 mt-2">Delivered</span>
@@ -136,7 +136,7 @@ const Login = ({ onLogin }) => {
         
         {/* Striped border at absolute bottom */}
         <div className="absolute bottom-0 w-full h-2 overflow-hidden flex">
-          <div className="w-full h-full bg-[#181C25]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #3B71F3, #3B71F3 10px, transparent 10px, transparent 20px)' }}></div>
+          <div className="w-full h-full bg-[#181C25]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #059669, #059669 10px, transparent 10px, transparent 20px)' }}></div>
         </div>
       </div>
 
@@ -173,7 +173,7 @@ const Login = ({ onLogin }) => {
                     type="text" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm"
                     placeholder="e.g. Kamal Perera"
                     required
                   />
@@ -185,7 +185,7 @@ const Login = ({ onLogin }) => {
                     type="tel" 
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm"
                     placeholder="e.g. 0771234567"
                     required
                   />
@@ -197,7 +197,7 @@ const Login = ({ onLogin }) => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     rows={2}
-                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                    className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm"
                     placeholder="e.g. 45 Main Street, Mahiyanganaya"
                     required
                   />
@@ -213,7 +213,7 @@ const Login = ({ onLogin }) => {
                 type="email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm"
                 placeholder="you@example.com"
                 required
               />
@@ -226,14 +226,14 @@ const Login = ({ onLogin }) => {
               <div className="flex justify-between items-center">
                 <label className="text-xs font-semibold text-gray-700">Password *</label>
                 {!isSignUp && (
-                  <a href="#" className="text-xs text-blue-600 hover:underline font-medium">Forgot password?</a>
+                  <a href="#" className="text-xs text-emerald-600 hover:text-emerald-700 hover:underline font-medium">Forgot password?</a>
                 )}
               </div>
               <input 
                 type="password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm shadow-sm tracking-widest font-mono"
+                className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm shadow-sm tracking-widest font-mono"
                 placeholder="••••••••"
                 required
               />
@@ -242,7 +242,7 @@ const Login = ({ onLogin }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full py-2.5 bg-[#3B71F3] hover:bg-blue-600 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-colors mt-2 shadow-sm"
+              className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-lg font-medium text-sm transition-all mt-2 shadow-md shadow-emerald-600/20"
             >
               {loading 
                 ? (isSignUp ? 'Creating Account...' : 'Signing in...') 
@@ -258,7 +258,7 @@ const Login = ({ onLogin }) => {
                 <button 
                   type="button"
                   onClick={() => { setIsSignUp(false); setError(''); }}
-                  className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                  className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
                 >
                   Sign in
                 </button>
@@ -269,7 +269,7 @@ const Login = ({ onLogin }) => {
                 <button 
                   type="button"
                   onClick={() => { setIsSignUp(true); setError(''); }}
-                  className="font-semibold text-blue-600 hover:underline cursor-pointer"
+                  className="font-semibold text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer"
                 >
                   Create customer account
                 </button>

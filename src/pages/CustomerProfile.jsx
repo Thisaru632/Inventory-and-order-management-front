@@ -67,22 +67,22 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="p-3 sm:p-5 max-w-3xl mx-auto space-y-3 sm:space-y-4">
       {/* Header */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center text-2xl font-bold shadow-md shadow-blue-500/20">
+      <div className="bg-white p-3.5 sm:p-4 rounded-xl shadow-xs border border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center text-base font-bold shadow-xs">
             {user?.name ? user.name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'C')}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-gray-900">{user?.name || 'Customer'}</h1>
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <Shield size={12} /> Customer Account
+              <h1 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">{user?.name || 'Customer'}</h1>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <Shield size={11} /> Customer
               </span>
             </div>
-            <p className="text-sm text-gray-500 mt-1 flex items-center gap-1.5">
-              <Mail size={14} className="text-gray-400" />
+            <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1.5">
+              <Mail size={12} className="text-gray-400" />
               Username: <span className="font-medium text-gray-700">{user?.email}</span>
             </p>
           </div>
@@ -92,9 +92,9 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-medium rounded-lg text-xs transition shadow-xs cursor-pointer"
             >
-              <Edit3 size={16} /> Edit Profile
+              <Edit3 size={13} /> Edit Profile
             </button>
           ) : (
             <button
@@ -108,7 +108,7 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
                 });
                 setMessage({ type: '', text: '' });
               }}
-              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl text-sm transition"
+              className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg text-xs transition cursor-pointer"
             >
               Cancel
             </button>
@@ -117,62 +117,62 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
       </div>
 
       {message.text && (
-        <div className={`p-4 rounded-xl flex items-center gap-3 text-sm font-medium border ${
+        <div className={`p-3 rounded-lg flex items-center gap-2 text-xs font-medium border ${
           message.type === 'success' 
             ? 'bg-green-50 text-green-800 border-green-200' 
             : 'bg-red-50 text-red-800 border-red-200'
         }`}>
-          {message.type === 'success' ? <CheckCircle size={18} className="text-green-600" /> : <AlertCircle size={18} className="text-red-600" />}
-          {message.text}
+          {message.type === 'success' ? <CheckCircle size={15} className="text-green-600 shrink-0" /> : <AlertCircle size={15} className="text-red-600 shrink-0" />}
+          <span>{message.text}</span>
         </div>
       )}
 
       {/* Main Profile Details Card */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 pb-3 border-b border-gray-100">
+      <div className="bg-white rounded-xl shadow-xs border border-gray-100 p-3.5 sm:p-5">
+        <h2 className="text-sm font-bold text-gray-800 mb-3 pb-2 border-b border-gray-100">
           Account & Delivery Details
         </h2>
 
         {!isEditing ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Full Name</span>
-              <p className="text-base font-medium text-gray-800 flex items-center gap-2">
-                <User size={16} className="text-gray-400" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Full Name</span>
+              <p className="text-xs font-medium text-gray-800 flex items-center gap-1.5">
+                <User size={14} className="text-gray-400 shrink-0" />
                 {user?.name || 'Not provided'}
               </p>
             </div>
 
-            <div className="space-y-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Email Address (Login Username)</span>
-              <p className="text-base font-medium text-gray-800 flex items-center gap-2">
-                <Mail size={16} className="text-gray-400" />
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Email Address (Login Username)</span>
+              <p className="text-xs font-medium text-gray-800 flex items-center gap-1.5">
+                <Mail size={14} className="text-gray-400 shrink-0" />
                 {user?.email}
               </p>
             </div>
 
-            <div className="space-y-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Phone Number</span>
-              <p className="text-base font-medium text-gray-800 flex items-center gap-2">
-                <Phone size={16} className="text-gray-400" />
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Phone Number</span>
+              <p className="text-xs font-medium text-gray-800 flex items-center gap-1.5">
+                <Phone size={14} className="text-gray-400 shrink-0" />
                 {user?.phone || <span className="text-gray-400 italic">No phone number added</span>}
               </p>
             </div>
 
-            <div className="space-y-1">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">Delivery Address</span>
-              <p className="text-base font-medium text-gray-800 flex items-start gap-2">
-                <MapPin size={16} className="text-gray-400 mt-1 flex-shrink-0" />
+            <div className="space-y-0.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Delivery Address</span>
+              <p className="text-xs font-medium text-gray-800 flex items-start gap-1.5">
+                <MapPin size={14} className="text-gray-400 mt-0.5 flex-shrink-0" />
                 <span>{user?.address || <span className="text-gray-400 italic">No delivery address added</span>}</span>
               </p>
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSave} className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <User size={14} className="text-gray-500" /> Full Name *
+                <label className="text-[11px] font-semibold text-gray-700 flex items-center gap-1.5">
+                  <User size={12} className="text-gray-500" /> Full Name *
                 </label>
                 <input
                   type="text"
@@ -180,69 +180,69 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   placeholder="Your full name"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <Mail size={14} className="text-gray-500" /> Email Address (Username)
+                <label className="text-[11px] font-semibold text-gray-700 flex items-center gap-1.5">
+                  <Mail size={12} className="text-gray-500" /> Email Address (Username)
                 </label>
                 <input
                   type="email"
                   disabled
                   value={user?.email || ''}
-                  className="w-full px-3 py-2 text-sm border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-200 bg-gray-50 text-gray-500 rounded-lg cursor-not-allowed"
                   title="Email cannot be changed"
                 />
-                <p className="text-xs text-gray-400 mt-0.5">Used as your username to log in.</p>
+                <p className="text-[10px] text-gray-400">Used as your username to log in.</p>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <Phone size={14} className="text-gray-500" /> Phone Number
+                <label className="text-[11px] font-semibold text-gray-700 flex items-center gap-1.5">
+                  <Phone size={12} className="text-gray-500" /> Phone Number
                 </label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   placeholder="e.g. +94 77 123 4567"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <Lock size={14} className="text-gray-500" /> New Password
+                <label className="text-[11px] font-semibold text-gray-700 flex items-center gap-1.5">
+                  <Lock size={12} className="text-gray-500" /> New Password
                 </label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   placeholder="Leave blank to keep existing password"
                 />
               </div>
 
-              <div className="space-y-1 md:col-span-2">
-                <label className="text-xs font-semibold text-gray-700 flex items-center gap-1.5">
-                  <MapPin size={14} className="text-gray-500" /> Delivery Address
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-[11px] font-semibold text-gray-700 flex items-center gap-1.5">
+                  <MapPin size={12} className="text-gray-500" /> Delivery Address
                 </label>
                 <textarea
                   name="address"
-                  rows={3}
+                  rows={2}
                   value={formData.address}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-2.5 py-1.5 text-xs border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
                   placeholder="Enter your street address, town, and postal code for delivery dispatches"
                 />
               </div>
             </div>
 
-            <div className="pt-4 flex justify-end gap-3 border-t border-gray-100">
+            <div className="pt-3 flex justify-end gap-2 border-t border-gray-100">
               <button
                 type="button"
                 onClick={() => {
@@ -254,16 +254,16 @@ const CustomerProfile = ({ user, onUpdateUser }) => {
                     password: ''
                   });
                 }}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                className="px-3 py-1.5 border border-gray-200 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-50 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex items-center gap-2 px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm transition disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-lg text-xs font-bold transition shadow-xs disabled:opacity-50 cursor-pointer"
               >
-                <Save size={16} /> {loading ? 'Saving...' : 'Save Changes'}
+                <Save size={13} /> {loading ? 'Saving...' : 'Save Profile'}
               </button>
             </div>
           </form>

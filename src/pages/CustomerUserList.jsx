@@ -275,33 +275,37 @@ const CustomerUserList = () => {
       )}
 
       {/* Header Banner */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-emerald-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-gradient-to-tr from-emerald-600 to-teal-600 text-white rounded-xl shadow-md shadow-emerald-500/20">
               <UserCheck size={24} />
-            </span>
-            <h1 className="text-2xl font-bold text-gray-900">Customer User List</h1>
-            <span className="ml-2 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
-              Admin & Super Admin
-            </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Customer User List</h1>
+                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  Admin & Super Admin
+                </span>
+              </div>
+              <p className="text-gray-500 text-sm mt-0.5">
+                Browse, manage, and view customer accounts registered on the customer portal.
+              </p>
+            </div>
           </div>
-          <p className="text-gray-500 text-sm mt-1">
-            Browse, manage, and view customer accounts registered on the customer portal.
-          </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => { fetchCustomerUsers(); fetchOrders(); }}
-            className="p-2.5 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded-xl transition border border-gray-200"
+            className="p-2.5 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-xl transition border border-emerald-200"
             title="Refresh List"
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
           </button>
           <button
             onClick={handleOpenAddModal}
-            className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl shadow-sm hover:shadow transition"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-sm font-bold rounded-xl shadow-md shadow-emerald-500/20 hover:shadow-lg transition"
           >
             <Plus size={18} /> Add Customer
           </button>
@@ -310,30 +314,30 @@ const CustomerUserList = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-gradient-to-br from-emerald-50/80 to-white p-5 rounded-2xl border border-emerald-200/90 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Total Customers</p>
-            <h3 className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</h3>
+            <p className="text-xs font-bold text-emerald-900 uppercase tracking-wider">Total Customers</p>
+            <h3 className="text-3xl font-black text-emerald-950 mt-1">{stats.total}</h3>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
             <Users size={22} />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-gradient-to-br from-teal-50/80 to-white p-5 rounded-2xl border border-teal-200/90 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Active Customers</p>
-            <h3 className="text-2xl font-bold text-emerald-600 mt-1">{stats.active}</h3>
+            <p className="text-xs font-bold text-teal-900 uppercase tracking-wider">Active Customers</p>
+            <h3 className="text-3xl font-black text-emerald-700 mt-1">{stats.active}</h3>
           </div>
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+          <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
             <CheckCircle2 size={22} />
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-medium text-gray-400 uppercase tracking-wider">Inactive Customers</p>
-            <h3 className="text-2xl font-bold text-gray-500 mt-1">{stats.inactive}</h3>
+            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Inactive Customers</p>
+            <h3 className="text-3xl font-bold text-gray-600 mt-1">{stats.inactive}</h3>
           </div>
           <div className="w-12 h-12 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center font-bold">
             <AlertCircle size={22} />
@@ -342,7 +346,7 @@ const CustomerUserList = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
         <div className="relative w-full sm:w-80">
           <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -350,7 +354,7 @@ const CustomerUserList = () => {
             placeholder="Search by name, email, phone, or address..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 hover:bg-gray-100/70 focus:bg-white border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 rounded-xl outline-none transition"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-emerald-50/20 hover:bg-emerald-50/40 focus:bg-white border border-emerald-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 rounded-xl outline-none transition"
           />
           {searchTerm && (
             <button 
@@ -363,33 +367,33 @@ const CustomerUserList = () => {
         </div>
 
         {/* Status Filters */}
-        <div className="flex items-center gap-1.5 w-full sm:w-auto bg-gray-50 p-1 rounded-xl border border-gray-100">
+        <div className="flex items-center gap-1.5 w-full sm:w-auto bg-emerald-50/60 p-1 rounded-xl border border-emerald-200/70">
           <button
             onClick={() => setStatusFilter('ALL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
               statusFilter === 'ALL'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm shadow-emerald-500/20'
+                : 'text-gray-600 hover:text-emerald-800 hover:bg-white/60'
             }`}
           >
             All ({customers.length})
           </button>
           <button
             onClick={() => setStatusFilter('Active')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
               statusFilter === 'Active'
-                ? 'bg-emerald-50 text-emerald-700 font-semibold shadow-sm'
-                : 'text-gray-500 hover:text-emerald-700'
+                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20'
+                : 'text-gray-600 hover:text-emerald-800 hover:bg-white/60'
             }`}
           >
             Active ({stats.active})
           </button>
           <button
             onClick={() => setStatusFilter('Inactive')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
               statusFilter === 'Inactive'
-                ? 'bg-gray-200 text-gray-800 font-semibold shadow-sm'
-                : 'text-gray-500 hover:text-gray-900'
+                ? 'bg-slate-700 text-white shadow-sm'
+                : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
             }`}
           >
             Inactive ({stats.inactive})
@@ -398,10 +402,10 @@ const CustomerUserList = () => {
       </div>
 
       {/* Customers Table */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm border border-emerald-200/80 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50/80 border-b border-gray-100 text-xs text-gray-500 font-semibold uppercase tracking-wider">
+            <thead className="bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/90 border-b border-emerald-200 text-xs text-emerald-950 font-bold uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-3.5">Customer</th>
                 <th className="px-6 py-3.5">Contact Number</th>
@@ -416,7 +420,7 @@ const CustomerUserList = () => {
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
                     <div className="flex flex-col items-center gap-2">
-                      <RefreshCw size={24} className="animate-spin text-blue-500" />
+                      <RefreshCw size={24} className="animate-spin text-emerald-500" />
                       <span>Loading customer users...</span>
                     </div>
                   </td>
@@ -425,7 +429,7 @@ const CustomerUserList = () => {
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
                     <div className="flex flex-col items-center gap-2">
-                      <Users size={32} className="text-gray-300" />
+                      <Users size={32} className="text-emerald-300" />
                       <p className="text-gray-600 font-medium">No customer accounts found</p>
                       <p className="text-xs text-gray-400">
                         {searchTerm ? 'Try adjusting your search criteria.' : 'Customers who register via the portal will appear here.'}
@@ -437,24 +441,24 @@ const CustomerUserList = () => {
                 filteredCustomers.map((cust) => {
                   const custOrders = getCustomerOrders(cust);
                   return (
-                    <tr key={cust.id} className="hover:bg-blue-50/20 transition group">
+                    <tr key={cust.id} className="hover:bg-emerald-50/30 transition group">
                       {/* Customer Name & Email */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-600 text-white flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-sm shadow-md shadow-emerald-500/20 flex-shrink-0">
                             {cust.name.charAt(0).toUpperCase()}
                           </div>
                           <div className="min-w-0">
-                            <div className="font-semibold text-gray-900 truncate flex items-center gap-1.5">
+                            <div className="font-bold text-gray-900 group-hover:text-emerald-950 transition truncate flex items-center gap-1.5">
                               {cust.name}
                               {custOrders.length > 0 && (
-                                <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200" title={`${custOrders.length} order(s)`}>
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200" title={`${custOrders.length} order(s)`}>
                                   {custOrders.length} {custOrders.length === 1 ? 'order' : 'orders'}
                                 </span>
                               )}
                             </div>
                             <div className="text-xs text-gray-500 flex items-center gap-1 mt-0.5 truncate">
-                              <Mail size={12} className="text-gray-400 flex-shrink-0" />
+                              <Mail size={12} className="text-emerald-600 flex-shrink-0" />
                               <span className="truncate">{cust.email}</span>
                             </div>
                           </div>
@@ -464,9 +468,9 @@ const CustomerUserList = () => {
                       {/* Phone */}
                       <td className="px-6 py-4 whitespace-nowrap">
                         {cust.phone ? (
-                          <div className="flex items-center gap-1.5 text-gray-700">
-                            <Phone size={13} className="text-gray-400" />
-                            <span className="font-mono text-xs">{cust.phone}</span>
+                          <div className="flex items-center gap-1.5 text-gray-800">
+                            <Phone size={13} className="text-emerald-600" />
+                            <span className="font-mono text-xs font-medium">{cust.phone}</span>
                           </div>
                         ) : (
                           <span className="text-gray-400 text-xs italic">Not provided</span>
@@ -476,8 +480,8 @@ const CustomerUserList = () => {
                       {/* Address */}
                       <td className="px-6 py-4 max-w-xs">
                         {cust.address ? (
-                          <div className="flex items-start gap-1.5 text-gray-700 text-xs line-clamp-2">
-                            <MapPin size={13} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                          <div className="flex items-start gap-1.5 text-gray-800 text-xs line-clamp-2">
+                            <MapPin size={13} className="text-emerald-600 flex-shrink-0 mt-0.5" />
                             <span>{cust.address}</span>
                           </div>
                         ) : (
@@ -489,24 +493,24 @@ const CustomerUserList = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => handleToggleStatus(cust)}
-                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold transition cursor-pointer ${
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition cursor-pointer ${
                             cust.status === 'Active'
-                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                              ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 hover:bg-emerald-200/80 shadow-xs'
                               : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
                           }`}
                           title="Click to toggle status"
                         >
-                          <span className={`w-1.5 h-1.5 rounded-full ${cust.status === 'Active' ? 'bg-emerald-500' : 'bg-gray-400'}`}></span>
+                          <span className={`w-1.5 h-1.5 rounded-full ${cust.status === 'Active' ? 'bg-emerald-600' : 'bg-gray-400'}`}></span>
                           {cust.status}
                         </button>
                       </td>
 
                       {/* Registered Date */}
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-600">
                         {cust.createdAt ? (
                           <div className="flex items-center gap-1.5">
-                            <Calendar size={13} className="text-gray-400" />
-                            <span>{new Date(cust.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                            <Calendar size={13} className="text-emerald-600" />
+                            <span className="font-medium">{new Date(cust.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                           </div>
                         ) : (
                           '—'
@@ -519,7 +523,7 @@ const CustomerUserList = () => {
                           {/* View details */}
                           <button
                             onClick={() => setSelectedCustomer(cust)}
-                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                            className="p-1.5 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-100/70 rounded-lg transition"
                             title="View Full Details"
                           >
                             <Eye size={16} />
@@ -528,7 +532,7 @@ const CustomerUserList = () => {
                           {/* Edit */}
                           <button
                             onClick={() => handleOpenEditModal(cust)}
-                            className="p-1.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition"
+                            className="p-1.5 text-teal-700 hover:text-teal-900 hover:bg-teal-100/70 rounded-lg transition"
                             title="Edit Customer"
                           >
                             <Edit2 size={16} />
@@ -537,7 +541,7 @@ const CustomerUserList = () => {
                           {/* Delete */}
                           <button
                             onClick={() => setDeleteConfirmUser(cust)}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
                             title="Delete Customer"
                           >
                             <Trash2 size={16} />
@@ -556,22 +560,22 @@ const CustomerUserList = () => {
       {/* MODAL: View Details */}
       {selectedCustomer && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full overflow-hidden border border-gray-100">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-emerald-100">
+            <div className="p-6 border-b border-emerald-100 bg-gradient-to-r from-emerald-50/70 via-teal-50/40 to-emerald-50/70 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-blue-500/20">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white flex items-center justify-center font-bold text-xl shadow-md shadow-emerald-500/20">
                   {selectedCustomer.name.charAt(0).toUpperCase()}
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">{selectedCustomer.name}</h3>
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                    <Shield size={10} /> Customer Account
+                  <span className="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    <Shield size={11} className="text-emerald-600" /> Customer Account
                   </span>
                 </div>
               </div>
               <button 
                 onClick={() => setSelectedCustomer(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition"
+                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-emerald-100/50 transition"
               >
                 <X size={18} />
               </button>
@@ -579,46 +583,46 @@ const CustomerUserList = () => {
 
             <div className="p-6 space-y-4 text-sm">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-400 uppercase font-medium">Username / Email</p>
-                  <p className="font-medium text-gray-900 mt-1 break-all flex items-center gap-1.5">
-                    <Mail size={14} className="text-blue-500 flex-shrink-0" />
+                <div className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl">
+                  <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">Username / Email</p>
+                  <p className="font-semibold text-gray-900 mt-1 break-all flex items-center gap-1.5">
+                    <Mail size={14} className="text-emerald-600 flex-shrink-0" />
                     {selectedCustomer.email}
                   </p>
                 </div>
 
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-400 uppercase font-medium">Phone Number</p>
-                  <p className="font-medium text-gray-900 mt-1 flex items-center gap-1.5">
-                    <Phone size={14} className="text-blue-500 flex-shrink-0" />
-                    {selectedCustomer.phone || <span className="text-gray-400 italic">Not provided</span>}
+                <div className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl">
+                  <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">Phone Number</p>
+                  <p className="font-semibold text-gray-900 mt-1 flex items-center gap-1.5">
+                    <Phone size={14} className="text-emerald-600 flex-shrink-0" />
+                    {selectedCustomer.phone || <span className="text-gray-400 italic font-normal">Not provided</span>}
                   </p>
                 </div>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl">
-                <p className="text-xs text-gray-400 uppercase font-medium">Delivery Address</p>
-                <p className="font-medium text-gray-900 mt-1 flex items-start gap-1.5">
-                  <MapPin size={14} className="text-blue-500 flex-shrink-0 mt-0.5" />
-                  <span>{selectedCustomer.address || <span className="text-gray-400 italic">Not provided</span>}</span>
+              <div className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl">
+                <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">Delivery Address</p>
+                <p className="font-semibold text-gray-900 mt-1 flex items-start gap-1.5">
+                  <MapPin size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <span>{selectedCustomer.address || <span className="text-gray-400 italic font-normal">Not provided</span>}</span>
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-400 uppercase font-medium">Account Status</p>
+                <div className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl">
+                  <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">Account Status</p>
                   <p className="font-medium mt-1">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                      selectedCustomer.status === 'Active' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700'
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                      selectedCustomer.status === 'Active' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-gray-200 text-gray-700'
                     }`}>
                       {selectedCustomer.status}
                     </span>
                   </p>
                 </div>
 
-                <div className="p-3 bg-gray-50 rounded-xl">
-                  <p className="text-xs text-gray-400 uppercase font-medium">Member Since</p>
-                  <p className="font-medium text-gray-900 mt-1">
+                <div className="p-3.5 bg-emerald-50/30 border border-emerald-100 rounded-xl">
+                  <p className="text-xs font-bold text-emerald-950 uppercase tracking-wider">Member Since</p>
+                  <p className="font-semibold text-gray-900 mt-1">
                     {selectedCustomer.createdAt 
                       ? new Date(selectedCustomer.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' }) 
                       : '—'}
@@ -628,25 +632,25 @@ const CustomerUserList = () => {
 
               {/* Related Orders */}
               <div className="pt-2">
-                <h4 className="font-semibold text-gray-800 flex items-center gap-2 mb-2">
-                  <ShoppingBag size={16} className="text-blue-600" />
+                <h4 className="font-bold text-gray-900 flex items-center gap-2 mb-2 text-sm">
+                  <ShoppingBag size={16} className="text-emerald-600" />
                   Order Activity ({getCustomerOrders(selectedCustomer).length})
                 </h4>
                 {getCustomerOrders(selectedCustomer).length === 0 ? (
-                  <p className="text-xs text-gray-400 italic bg-gray-50 p-3 rounded-xl">
+                  <p className="text-xs text-gray-400 italic bg-emerald-50/20 border border-emerald-100/60 p-3 rounded-xl">
                     No orders linked to this customer yet.
                   </p>
                 ) : (
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {getCustomerOrders(selectedCustomer).map((order, idx) => (
-                      <div key={idx} className="p-2.5 bg-gray-50 rounded-xl flex items-center justify-between text-xs">
+                      <div key={idx} className="p-2.5 bg-emerald-50/40 border border-emerald-100 rounded-xl flex items-center justify-between text-xs">
                         <div>
-                          <span className="font-semibold text-gray-800">{order.material?.name || 'Item'}</span>
-                          <span className="text-gray-500 ml-1">× {order.quantity} {order.unit}</span>
-                          <p className="text-[11px] text-gray-400 mt-0.5">Warehouse: {order.store?.name || 'Main'}</p>
+                          <span className="font-bold text-gray-900">{order.material?.name || 'Item'}</span>
+                          <span className="text-emerald-700 font-semibold ml-1.5">× {order.quantity} {order.unit}</span>
+                          <p className="text-[11px] text-gray-500 mt-0.5">Warehouse: {order.store?.name || 'Main'}</p>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-full font-semibold text-[10px] ${
-                          order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                        <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
+                          order.status === 'DELIVERED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-amber-100 text-amber-800 border border-amber-200'
                         }`}>
                           {order.status}
                         </span>
@@ -657,20 +661,20 @@ const CustomerUserList = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-2">
+            <div className="p-4 bg-emerald-50/30 border-t border-emerald-100 flex items-center justify-end gap-2">
               <button
                 onClick={() => {
                   const cust = selectedCustomer;
                   setSelectedCustomer(null);
                   handleOpenEditModal(cust);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-sm transition"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold rounded-xl text-sm transition shadow-sm shadow-emerald-500/20"
               >
                 Edit Details
               </button>
               <button
                 onClick={() => setSelectedCustomer(null)}
-                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-xl text-sm transition"
+                className="px-4 py-2 bg-white border border-gray-200 hover:bg-gray-100 text-gray-700 font-medium rounded-xl text-sm transition"
               >
                 Close
               </button>
@@ -682,14 +686,17 @@ const CustomerUserList = () => {
       {/* MODAL: Add Customer */}
       {isAddModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-gray-100">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-emerald-100">
+            <div className="p-5 border-b border-emerald-100 bg-gradient-to-r from-emerald-50/70 via-teal-50/40 to-emerald-50/70 flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <UserCheck className="text-blue-600" size={20} /> Add New Customer
+                <div className="p-1.5 bg-gradient-to-tr from-emerald-600 to-teal-600 text-white rounded-lg shadow-sm">
+                  <UserCheck size={18} />
+                </div>
+                <span>Add New Customer</span>
               </h3>
               <button 
                 onClick={() => setIsAddModalOpen(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-emerald-100/50"
               >
                 <X size={18} />
               </button>
@@ -697,69 +704,69 @@ const CustomerUserList = () => {
 
             <form onSubmit={handleCreateCustomer} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. John Doe"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Email (Username)</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Email (Username)</label>
                 <input
                   type="email"
                   required
                   placeholder="customer@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Password</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
                 <input
                   type="password"
                   required
                   placeholder="At least 6 characters"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Phone Number</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Phone Number</label>
                 <input
                   type="text"
                   placeholder="e.g. 0712345678"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Delivery Address</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Delivery Address</label>
                 <textarea
                   rows="2"
                   placeholder="Street address, city, etc."
                   value={formData.address}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 ></textarea>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Status</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Status</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
@@ -777,7 +784,7 @@ const CustomerUserList = () => {
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow transition disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-md shadow-emerald-500/20 transition disabled:opacity-50 flex items-center gap-2"
                 >
                   {actionLoading ? <RefreshCw size={14} className="animate-spin" /> : null}
                   Create Account
@@ -791,14 +798,17 @@ const CustomerUserList = () => {
       {/* MODAL: Edit Customer */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-gray-100">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-emerald-100">
+            <div className="p-5 border-b border-emerald-100 bg-gradient-to-r from-emerald-50/70 via-teal-50/40 to-emerald-50/70 flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <Edit2 className="text-emerald-600" size={20} /> Edit Customer
+                <div className="p-1.5 bg-gradient-to-tr from-emerald-600 to-teal-600 text-white rounded-lg shadow-sm">
+                  <Edit2 size={18} />
+                </div>
+                <span>Edit Customer</span>
               </h3>
               <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-emerald-100/50"
               >
                 <X size={18} />
               </button>
@@ -806,7 +816,7 @@ const CustomerUserList = () => {
 
             <form onSubmit={handleUpdateCustomer} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Email / Username</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Email / Username</label>
                 <input
                   type="email"
                   disabled
@@ -816,38 +826,38 @@ const CustomerUserList = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Full Name</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Full Name</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Phone Number</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Phone Number</label>
                 <input
                   type="text"
                   value={formData.phone}
                   onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Delivery Address</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Delivery Address</label>
                 <textarea
                   rows="2"
                   value={formData.address}
                   onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 ></textarea>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">
                   Change Password <span className="text-gray-400 font-normal">(Leave blank to keep unchanged)</span>
                 </label>
                 <input
@@ -855,16 +865,16 @@ const CustomerUserList = () => {
                   placeholder="Enter new password"
                   value={formData.password}
                   onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">Account Status</label>
+                <label className="block text-xs font-bold text-gray-700 uppercase mb-1">Account Status</label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none"
+                  className="w-full px-3.5 py-2 text-sm border border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                 >
                   <option value="Active">Active</option>
                   <option value="Inactive">Inactive</option>
@@ -882,7 +892,7 @@ const CustomerUserList = () => {
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow transition disabled:opacity-50 flex items-center gap-2"
+                  className="px-5 py-2 text-sm font-bold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl shadow-md shadow-emerald-500/20 transition disabled:opacity-50 flex items-center gap-2"
                 >
                   {actionLoading ? <RefreshCw size={14} className="animate-spin" /> : null}
                   Save Changes

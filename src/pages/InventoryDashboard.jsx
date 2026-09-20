@@ -77,8 +77,12 @@ const InventoryDashboard = () => {
       calendarOrders[day].push({
         id: `DEL-${d._id.substring(d._id.length - 6).toUpperCase()}`,
         customer: d.customerShopName || 'Unknown Customer',
-        product: d.material?.name || 'Unknown Product',
-        qty: `${d.quantity} ${d.unit || ''}`.trim(),
+        product: d.items && d.items.length > 1
+          ? `${d.items.length} Items (${d.items.map(it => it.material?.name || 'Item').slice(0, 2).join(', ')}${d.items.length > 2 ? '...' : ''})`
+          : d.material?.name || d.items?.[0]?.material?.name || 'Unknown Product',
+        qty: d.items && d.items.length > 1
+          ? `${d.items.reduce((s, it) => s + (Number(it.quantity) || 0), 0)} Units`
+          : `${d.quantity || d.items?.[0]?.quantity || 1} ${d.unit || d.items?.[0]?.unit || ''}`.trim(),
         status: d.status || 'PENDING',
         scheduledDate: d.scheduledDate
       });
@@ -432,7 +436,7 @@ const InventoryDashboard = () => {
       <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <LayoutDashboard className="text-blue-600" /> Dashboard Overview
+            <LayoutDashboard className="text-emerald-600" /> Dashboard Overview
           </h1>
           <p className="text-gray-500 text-sm mt-1">Key metrics and recent inventory status</p>
         </div>
@@ -446,16 +450,16 @@ const InventoryDashboard = () => {
       </div>
 
       {/* Tabs and Filters */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-gray-200 gap-3 pb-2">
-        <div className="flex">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-emerald-100 gap-3 pb-3">
+        <div className="inline-flex bg-emerald-50/70 p-1 rounded-xl border border-emerald-200/80 gap-1 text-xs sm:text-sm font-semibold shadow-xs">
           {tabs.map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-2 py-1 text-sm text-xs font-medium transition-colors border-b-2 -mb-[3px]
-                ${activeTab === tab 
-                  ? 'border-blue-600 text-blue-600' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
+              className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all ${
+                activeTab === tab 
+                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30' 
+                  : 'text-gray-600 hover:text-emerald-800 hover:bg-white/80'}`}
             >
               {tab}
             </button>
@@ -467,8 +471,8 @@ const InventoryDashboard = () => {
             {assignedWarehouse ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-gray-500">Warehouse:</span>
-                <span className="bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-md flex items-center gap-1.5 shadow-sm">
-                  <Warehouse size={14} className="text-blue-600" /> {assignedWarehouse}
+                <span className="bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold px-2.5 py-1 rounded-md flex items-center gap-1.5 shadow-xs">
+                  <Warehouse size={14} className="text-emerald-600" /> {assignedWarehouse}
                 </span>
               </div>
             ) : (
@@ -477,7 +481,7 @@ const InventoryDashboard = () => {
                 <select
                   value={selectedLocation}
                   onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 transition"
+                  className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2 transition"
                 >
                   <option value="All Warehouses">All Warehouses</option>
                   {stores.map(store => (
@@ -494,7 +498,7 @@ const InventoryDashboard = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-              <CalendarIcon className="text-blue-600" /> {monthName}
+              <CalendarIcon className="text-emerald-600" /> {monthName}
             </h2>
             <div className="flex gap-2">
               <button className="p-2 text-gray-400 hover:text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition"><ChevronLeft size={20}/></button>
@@ -519,18 +523,18 @@ const InventoryDashboard = () => {
                   key={index} 
                   onClick={() => handleDateClick(day)}
                   className={`min-h-[100px] bg-white p-2 transition relative 
-                    ${!day ? 'bg-slate-50/50' : 'hover:bg-blue-50/40'} 
+                    ${!day ? 'bg-slate-50/50' : 'hover:bg-emerald-50/40'} 
                     ${hasOrders ? 'cursor-pointer' : ''}
-                    ${isToday ? 'bg-blue-50/30 ring-1 ring-inset ring-blue-300' : ''}`}
+                    ${isToday ? 'bg-emerald-50/40 ring-1 ring-inset ring-emerald-400' : ''}`}
                 >
                   {day && (
                     <>
-                      <span className={`text-xs font-medium ${isToday ? 'text-blue-700' : 'text-slate-700'}`}>
+                      <span className={`text-xs font-medium ${isToday ? 'text-emerald-800 font-bold' : 'text-slate-700'}`}>
                         {day}
                       </span>
                       {hasOrders && (
                         <div className="mt-2 space-y-1">
-                          <div className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-md font-medium border border-blue-100 inline-block shadow-sm">
+                          <div className="text-xs bg-emerald-50 text-emerald-800 px-2 py-1 rounded-md font-semibold border border-emerald-200 inline-block shadow-xs">
                             {orders.length} Order{orders.length > 1 ? 's' : ''}
                           </div>
                         </div>
@@ -545,40 +549,40 @@ const InventoryDashboard = () => {
       ) : activeTab === 'Future Predictions' ? (
         <div className="space-y-4">
           {/* Header & Filter Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+          <div className="bg-gradient-to-r from-emerald-700 via-teal-700 to-emerald-800 rounded-2xl shadow-xl shadow-emerald-900/15 p-6 text-white relative overflow-hidden border border-emerald-500/30">
+            <div className="absolute top-0 right-0 p-8 opacity-15 pointer-events-none">
               <BrainCircuit size={160} />
             </div>
 
             <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               <div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-400/30 rounded-full text-blue-200 text-xs font-semibold mb-3">
-                  <Sparkles size={14} className="text-blue-300" /> AI Stock Demand & Refill Predictor
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 border border-white/30 rounded-full text-white text-xs font-bold mb-3 shadow-xs">
+                  <Sparkles size={14} className="text-emerald-200" /> AI Stock Demand & Refill Predictor
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white drop-shadow-sm">
                   {predictionPeriod === 'daily' && "Daily Stock Movements & Tomorrow's Forecast"}
                   {predictionPeriod === 'weekly' && "Weekly Consumption & Next Week Demand Forecast"}
                   {predictionPeriod === 'monthly' && "Monthly Velocity & Next Month Refill Forecast"}
                 </h2>
-                <p className="text-blue-200/90 text-sm max-w-2xl mt-1.5 leading-relaxed">
+                <p className="text-emerald-100 text-sm max-w-2xl mt-1.5 leading-relaxed">
                   {predictionPeriod === 'daily' && "Displaying past 3 days of material stock in & out records to predict tomorrow's required stock, detect deficit risks, and calculate exact refill quantities."}
                   {predictionPeriod === 'weekly' && "Analyzing the past week (last 7 days) of material movements to project next week's inventory requirements and recommend safety buffer refills."}
                   {predictionPeriod === 'monthly' && "Analyzing previous month consumption patterns to forecast next month's stock orders and prevent warehouse stockouts."}
                 </p>
-                <div className="flex items-center gap-2 mt-3 text-xs text-blue-300/80 font-medium">
-                  <Warehouse size={14} className="text-blue-400" />
-                  <span>Scope: <strong className="text-white">{activeLoc || 'All Warehouses'}</strong></span>
+                <div className="flex items-center gap-2 mt-3 text-xs text-emerald-100 font-medium">
+                  <Warehouse size={14} className="text-emerald-200" />
+                  <span>Scope: <strong className="text-white bg-white/10 px-2 py-0.5 rounded border border-white/20">{activeLoc || 'All Warehouses'}</strong></span>
                 </div>
               </div>
 
               {/* Filter Tabs: Daily / Weekly / Monthly */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-slate-950/60 p-1.5 rounded-xl border border-white/10 backdrop-blur-md self-start lg:self-auto shrink-0 shadow-inner">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-emerald-950/40 p-1.5 rounded-xl border border-white/20 backdrop-blur-md self-start lg:self-auto shrink-0 shadow-inner">
                 <button
                   onClick={() => setPredictionPeriod('daily')}
                   className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                     predictionPeriod === 'daily'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 ring-2 ring-blue-400/30'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-white text-emerald-800 shadow-md shadow-emerald-950/20 ring-2 ring-white/70'
+                      : 'text-emerald-100 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <Clock size={15} />
@@ -589,8 +593,8 @@ const InventoryDashboard = () => {
                   onClick={() => setPredictionPeriod('weekly')}
                   className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                     predictionPeriod === 'weekly'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 ring-2 ring-blue-400/30'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-white text-emerald-800 shadow-md shadow-emerald-950/20 ring-2 ring-white/70'
+                      : 'text-emerald-100 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <CalendarDays size={15} />
@@ -601,8 +605,8 @@ const InventoryDashboard = () => {
                   onClick={() => setPredictionPeriod('monthly')}
                   className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-xs font-bold transition-all duration-200 ${
                     predictionPeriod === 'monthly'
-                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/40 ring-2 ring-blue-400/30'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-white text-emerald-800 shadow-md shadow-emerald-950/20 ring-2 ring-white/70'
+                      : 'text-emerald-100 hover:text-white hover:bg-white/10'
                   }`}
                 >
                   <CalendarIcon size={15} />
@@ -613,15 +617,15 @@ const InventoryDashboard = () => {
           </div>
 
           {/* Search & Status Filters */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="bg-white rounded-xl shadow-sm border border-emerald-100 p-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="relative flex-1 max-w-md">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
                 type="text"
                 placeholder="Search material by name, SKU, or category..."
                 value={predictionSearch}
                 onChange={(e) => setPredictionSearch(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition"
+                className="w-full pl-9 pr-4 py-2 text-xs bg-emerald-50/20 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white transition"
               />
               {predictionSearch && (
                 <button
@@ -633,13 +637,13 @@ const InventoryDashboard = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 bg-emerald-50/60 p-1 rounded-xl border border-emerald-200/70">
               <button
                 onClick={() => setPredictionStatusFilter('ALL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition ${
                   predictionStatusFilter === 'ALL'
-                    ? 'bg-gray-900 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm shadow-emerald-500/20'
+                    : 'text-gray-600 hover:text-emerald-800 hover:bg-white/60'
                 }`}
               >
                 All Materials ({predictionsData.length})
@@ -647,7 +651,7 @@ const InventoryDashboard = () => {
 
               <button
                 onClick={() => setPredictionStatusFilter('REFILL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
                   predictionStatusFilter === 'REFILL'
                     ? 'bg-amber-600 text-white shadow-sm'
                     : 'bg-amber-50 text-amber-800 hover:bg-amber-100 border border-amber-200'
@@ -659,7 +663,7 @@ const InventoryDashboard = () => {
 
               <button
                 onClick={() => setPredictionStatusFilter('SUFFICIENT')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
                   predictionStatusFilter === 'SUFFICIENT'
                     ? 'bg-emerald-600 text-white shadow-sm'
                     : 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200'
@@ -672,34 +676,34 @@ const InventoryDashboard = () => {
           </div>
 
           {/* Material-wise Predictions & Stock Movement Table */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-emerald-200/80 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/90 border-b border-emerald-200">
                   <tr>
-                    <th className="px-3.5 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-4 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider">
                       Material / SKU
                     </th>
-                    <th className="px-3 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
+                    <th className="px-3 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider text-right">
                       Current Stock
                     </th>
-                    <th className="px-3 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider">
+                    <th className="px-3 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider">
                       {predictionPeriod === 'daily' && "Past 3 Days Movements (In & Out)"}
                       {predictionPeriod === 'weekly' && "Past Week Records (In & Out)"}
                       {predictionPeriod === 'monthly' && "Previous Month Records (In & Out)"}
                     </th>
-                    <th className="px-3 py-3 text-xs font-bold text-blue-700 uppercase tracking-wider text-center bg-blue-50/40">
+                    <th className="px-3 py-3.5 text-xs font-extrabold text-emerald-900 uppercase tracking-wider text-center bg-emerald-100/70 border-x border-emerald-200/80">
                       {predictionPeriod === 'daily' && "Predicted Tomorrow Need"}
                       {predictionPeriod === 'weekly' && "Predicted Next Week Need"}
                       {predictionPeriod === 'monthly' && "Predicted Next Month Need"}
                     </th>
-                    <th className="px-3 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider text-center">
+                    <th className="px-3 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider text-center">
                       Want to Refill?
                     </th>
-                    <th className="px-3.5 py-3 text-xs font-bold text-gray-700 uppercase tracking-wider text-right">
+                    <th className="px-3.5 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider text-right">
                       How Much to Refill
                     </th>
-                    <th className="px-2 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider text-center w-12">
+                    <th className="px-2 py-3.5 text-xs font-bold text-emerald-950 uppercase tracking-wider text-center w-12">
                       Details
                     </th>
                   </tr>
@@ -709,7 +713,7 @@ const InventoryDashboard = () => {
                     <tr>
                       <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
                         <div className="flex flex-col items-center justify-center">
-                          <Package className="text-gray-300 mb-2" size={40} />
+                          <Package className="text-emerald-300 mb-2" size={40} />
                           <p className="font-semibold text-gray-700 text-sm">No matching material records found</p>
                           <p className="text-xs text-gray-400 mt-1">Try adjusting your search query or status filter.</p>
                         </div>
@@ -723,16 +727,16 @@ const InventoryDashboard = () => {
 
                       return (
                         <React.Fragment key={item._id || item.sku}>
-                          <tr className="hover:bg-blue-50/20 transition-colors">
+                          <tr className="hover:bg-emerald-50/30 transition-colors">
                             {/* Material & SKU */}
-                            <td className="px-3.5 py-3 align-top">
+                            <td className="px-4 py-3.5 align-top">
                               <div className="font-bold text-gray-900 leading-snug">{item.name}</div>
                               <div className="flex items-center gap-1.5 mt-1">
-                                <span className="text-[11px] font-mono text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+                                <span className="text-[11px] font-mono font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
                                   {item.sku}
                                 </span>
                                 {item.category && (
-                                  <span className="text-[10px] text-gray-500 bg-slate-50 border border-slate-200 px-1.5 py-0.5 rounded font-medium">
+                                  <span className="text-[10px] text-teal-700 bg-teal-50 border border-teal-200 px-1.5 py-0.5 rounded font-semibold">
                                     {item.category}
                                   </span>
                                 )}
@@ -740,9 +744,9 @@ const InventoryDashboard = () => {
                             </td>
 
                             {/* Current Available Stock */}
-                            <td className="px-3 py-3 align-top text-right">
-                              <div className="font-bold text-gray-900 text-base">
-                                {formatQty(item.currentStock)} <span className="text-xs font-medium text-gray-500">{item.baseUnit}</span>
+                            <td className="px-3 py-3.5 align-top text-right">
+                              <div className="font-extrabold text-gray-900 text-base">
+                                {formatQty(item.currentStock)} <span className="text-xs font-semibold text-emerald-700">{item.baseUnit}</span>
                               </div>
                               <div className="mt-1 flex items-center justify-end gap-1.5">
                                 <span className="text-[10px] text-gray-500">Min Alert: {item.minStockAlert || 0}</span>
@@ -757,14 +761,14 @@ const InventoryDashboard = () => {
                             </td>
 
                             {/* Past Stock In & Out Records */}
-                            <td className="px-3 py-3 align-top">
+                            <td className="px-3 py-3.5 align-top">
                               {predictionPeriod === 'daily' ? (
                                 <div className="space-y-1.5">
                                   {/* 3 Days breakdown */}
                                   <div className="grid grid-cols-3 gap-1.5 text-[11px]">
                                     {item.pastDetails.days?.map((day, idx) => (
-                                      <div key={idx} className="bg-gray-50 border border-gray-100 rounded-md p-1 text-center">
-                                        <div className="text-[10px] font-medium text-gray-500 truncate" title={day.dateLabel}>
+                                      <div key={idx} className="bg-emerald-50/30 border border-emerald-100/90 rounded-lg p-1 text-center">
+                                        <div className="text-[10px] font-semibold text-emerald-950 truncate" title={day.dateLabel}>
                                           {day.dateLabel}
                                         </div>
                                         <div className="text-[10px] font-bold text-emerald-700 mt-0.5">
@@ -776,11 +780,11 @@ const InventoryDashboard = () => {
                                       </div>
                                     ))}
                                   </div>
-                                  <div className="flex items-center justify-between text-[11px] font-semibold bg-slate-50 px-2 py-1 rounded border border-slate-100">
-                                    <span className="text-gray-500">3-Day Total:</span>
+                                  <div className="flex items-center justify-between text-[11px] font-semibold bg-emerald-50/70 px-2 py-1 rounded-lg border border-emerald-200/80">
+                                    <span className="text-emerald-950 font-bold">3-Day Total:</span>
                                     <div className="flex items-center gap-2">
-                                      <span className="text-emerald-700">In: +{formatQty(item.pastDetails.totalStockIn)}</span>
-                                      <span className="text-rose-600">Out: -{formatQty(item.pastDetails.totalStockOut)}</span>
+                                      <span className="text-emerald-700 font-bold">In: +{formatQty(item.pastDetails.totalStockIn)}</span>
+                                      <span className="text-rose-600 font-bold">Out: -{formatQty(item.pastDetails.totalStockOut)}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -794,9 +798,9 @@ const InventoryDashboard = () => {
                                     <span className="text-gray-500">Past 7 Days Out:</span>
                                     <span className="font-bold text-rose-600">-{formatQty(item.pastDetails.totalStockOut)} {item.baseUnit}</span>
                                   </div>
-                                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-0.5 border-t border-gray-100">
+                                  <div className="text-[11px] text-emerald-800 flex items-center justify-between pt-0.5 border-t border-emerald-100">
                                     <span>Daily Outflow Rate:</span>
-                                    <span className="font-medium text-gray-700">~{formatQty(item.pastDetails.avgOutPerDay)} {item.baseUnit}/day</span>
+                                    <span className="font-bold text-emerald-900">~{formatQty(item.pastDetails.avgOutPerDay)} {item.baseUnit}/day</span>
                                   </div>
                                 </div>
                               ) : (
@@ -809,22 +813,22 @@ const InventoryDashboard = () => {
                                     <span className="text-gray-500">Past 30 Days Out:</span>
                                     <span className="font-bold text-rose-600">-{formatQty(item.pastDetails.totalStockOut)} {item.baseUnit}</span>
                                   </div>
-                                  <div className="text-[11px] text-gray-500 flex items-center justify-between pt-0.5 border-t border-gray-100">
+                                  <div className="text-[11px] text-emerald-800 flex items-center justify-between pt-0.5 border-t border-emerald-100">
                                     <span>Weekly Outflow Rate:</span>
-                                    <span className="font-medium text-gray-700">~{formatQty(item.pastDetails.avgOutPerWeek)} {item.baseUnit}/wk</span>
+                                    <span className="font-bold text-emerald-900">~{formatQty(item.pastDetails.avgOutPerWeek)} {item.baseUnit}/wk</span>
                                   </div>
                                 </div>
                               )}
                             </td>
 
                             {/* Predicted Need / Demand */}
-                            <td className="px-3 py-3 align-top text-center bg-blue-50/20">
-                              <div className="font-extrabold text-blue-700 text-lg">
-                                {formatQty(item.predictedNeed)} <span className="text-xs font-semibold text-blue-500">{item.baseUnit}</span>
+                            <td className="px-3 py-3.5 align-top text-center bg-emerald-50/50 border-x border-emerald-100/80">
+                              <div className="font-black text-emerald-800 text-xl">
+                                {formatQty(item.predictedNeed)} <span className="text-xs font-bold text-emerald-600">{item.baseUnit}</span>
                               </div>
                               <div className="mt-1 flex items-center justify-center gap-1">
-                                <span className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.2 rounded-full ${
-                                  item.trend === 'up' ? 'bg-amber-100 text-amber-800' : item.trend === 'down' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-700'
+                                <span className={`inline-flex items-center gap-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
+                                  item.trend === 'up' ? 'bg-amber-100 text-amber-800' : item.trend === 'down' ? 'bg-teal-100 text-teal-800' : 'bg-emerald-100 text-emerald-800'
                                 }`}>
                                   {item.trend === 'up' ? <TrendingUp size={11} /> : item.trend === 'down' ? <TrendingDown size={11} /> : <BarChart2 size={11} />}
                                   {item.trend === 'up' ? 'High Outflow' : item.trend === 'down' ? 'Slow Outflow' : 'Steady'}
@@ -833,7 +837,7 @@ const InventoryDashboard = () => {
                             </td>
 
                             {/* Want to Refill Stock? (Prediction) */}
-                            <td className="px-3 py-3 align-top text-center">
+                            <td className="px-3 py-3.5 align-top text-center">
                               {item.needsRefill ? (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-300 shadow-sm animate-pulse">
                                   <AlertTriangle size={13} className="text-amber-600" />
@@ -855,7 +859,7 @@ const InventoryDashboard = () => {
                             </td>
 
                             {/* How Much to Refill? */}
-                            <td className="px-3.5 py-3 align-top text-right">
+                            <td className="px-3.5 py-3.5 align-top text-right">
                               {item.needsRefill ? (
                                 <div>
                                   <div className="inline-block px-2.5 py-1 bg-amber-500/10 border border-amber-300 rounded-lg text-amber-900 font-extrabold text-sm shadow-sm">
@@ -867,7 +871,7 @@ const InventoryDashboard = () => {
                                 </div>
                               ) : (
                                 <div>
-                                  <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-md inline-block">
+                                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-1 rounded-md inline-block">
                                     0 {item.baseUnit} (Optimal)
                                   </span>
                                   <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
@@ -878,10 +882,10 @@ const InventoryDashboard = () => {
                             </td>
 
                             {/* Details toggle */}
-                            <td className="px-2 py-3 align-top text-center">
+                            <td className="px-2 py-3.5 align-top text-center">
                               <button
                                 onClick={() => setExpandedMaterialId(isExpanded ? null : item._id)}
-                                className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition"
+                                className="p-1.5 text-gray-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition"
                                 title="View calculation breakdown"
                               >
                                 {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -891,39 +895,39 @@ const InventoryDashboard = () => {
 
                           {/* Expandable Calculation Breakdown Drawer */}
                           {isExpanded && (
-                            <tr className="bg-slate-50/70 border-b border-gray-100">
+                            <tr className="bg-emerald-50/20 border-b border-emerald-100">
                               <td colSpan="7" className="p-4 text-xs">
-                                <div className="bg-white p-3.5 rounded-lg border border-gray-200 shadow-sm space-y-2">
-                                  <div className="flex items-center gap-2 font-bold text-gray-800 text-sm border-b border-gray-100 pb-1.5">
-                                    <BrainCircuit size={15} className="text-blue-600" />
+                                <div className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-3">
+                                  <div className="flex items-center gap-2 font-bold text-emerald-950 text-sm border-b border-emerald-100 pb-2">
+                                    <BrainCircuit size={16} className="text-emerald-600" />
                                     <span>Refill Calculation Breakdown &mdash; {item.name}</span>
                                   </div>
 
                                   <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs pt-1">
-                                    <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-200">
                                       <span className="text-gray-500 block text-[11px]">1. Current Available Stock</span>
                                       <strong className="text-gray-900 text-sm">{formatQty(item.currentStock)} {item.baseUnit}</strong>
                                     </div>
-                                    <div className="bg-gray-50 p-2.5 rounded border border-gray-100">
+                                    <div className="bg-gray-50 p-2.5 rounded-lg border border-gray-200">
                                       <span className="text-gray-500 block text-[11px]">2. Min Safety Limit</span>
                                       <strong className="text-gray-900 text-sm">{formatQty(item.minStockAlert || 0)} {item.baseUnit}</strong>
                                     </div>
-                                    <div className="bg-blue-50/60 p-2.5 rounded border border-blue-100">
-                                      <span className="text-blue-700 block text-[11px]">3. Predicted {item.futureLabel} Need</span>
-                                      <strong className="text-blue-900 text-sm">{formatQty(item.predictedNeed)} {item.baseUnit}</strong>
+                                    <div className="bg-emerald-50/80 p-2.5 rounded-lg border border-emerald-200">
+                                      <span className="text-emerald-700 block text-[11px] font-semibold">3. Predicted {item.futureLabel} Need</span>
+                                      <strong className="text-emerald-900 text-sm font-extrabold">{formatQty(item.predictedNeed)} {item.baseUnit}</strong>
                                     </div>
-                                    <div className={`p-2.5 rounded border ${
+                                    <div className={`p-2.5 rounded-lg border ${
                                       item.needsRefill ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'
                                     }`}>
-                                      <span className="block text-[11px]">4. Suggested Refill Order</span>
-                                      <strong className="text-sm">
+                                      <span className="block text-[11px] font-semibold">4. Suggested Refill Order</span>
+                                      <strong className="text-sm font-extrabold">
                                         {item.needsRefill ? `+${formatQty(item.refillAmount)} ${item.baseUnit}` : `0 ${item.baseUnit}`}
                                       </strong>
                                     </div>
                                   </div>
 
-                                  <div className="text-[11px] text-gray-500 italic pt-1 flex items-center gap-1.5">
-                                    <HelpCircle size={13} className="text-gray-400 shrink-0" />
+                                  <div className="text-[11px] text-emerald-800 bg-emerald-50/50 p-2.5 rounded-lg border border-emerald-100 flex items-center gap-1.5">
+                                    <HelpCircle size={14} className="text-emerald-600 shrink-0" />
                                     <span>
                                       Formula: Target Buffer = (Predicted Need: {formatQty(item.predictedNeed)} + Safety Limit: {formatQty(item.minStockAlert || 0)} = {formatQty(item.targetLevel)} {item.baseUnit}). 
                                       {item.needsRefill 
@@ -951,9 +955,9 @@ const InventoryDashboard = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                  <BarChart2 className="text-blue-600" /> 7-Day Transaction Analysis
+                  <BarChart2 className="text-emerald-600" /> 7-Day Transaction Analysis
                 </h2>
-                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-100">
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                   {assignedWarehouse ? `Warehouse: ${assignedWarehouse}` : `Location: ${selectedLocation}`}
                 </span>
               </div>
@@ -966,7 +970,7 @@ const InventoryDashboard = () => {
               <select
                 value={selectedMaterialForAnalysis}
                 onChange={(e) => setSelectedMaterialForAnalysis(e.target.value)}
-                className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 min-w-[150px] transition"
+                className="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block p-2 min-w-[150px] transition"
               >
                 <option value="All Materials">All Materials</option>
                 {Array.from(new Set(
@@ -1048,7 +1052,7 @@ const InventoryDashboard = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-start gap-3">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
                 <Package size={24} />
               </div>
               <div>
@@ -1090,7 +1094,7 @@ const InventoryDashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-start gap-3">
-              <div className="p-3 bg-blue-50 text-blue-600 rounded-lg">
+              <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
                 <Warehouse size={24} />
               </div>
               <div>
@@ -1189,8 +1193,8 @@ const InventoryDashboard = () => {
                             {item.store?.name || 'Unknown Store'}
                           </div>
                         </td>
-                        <td className="px-2 py-1 text-sm text-right font-medium text-blue-600">
-                          {item.availableQuantity} <span className="text-blue-300 text-xs ml-1">{item.material?.baseUnit}</span>
+                        <td className="px-2 py-1 text-sm text-right font-medium text-emerald-700">
+                          {item.availableQuantity} <span className="text-emerald-500 text-xs ml-1">{item.material?.baseUnit}</span>
                         </td>
                         <td className="px-2 py-1 text-sm">
                           {item.quantityInBaseUnit <= 0 ? (
@@ -1233,7 +1237,7 @@ const InventoryDashboard = () => {
             <div className="p-4 overflow-y-auto flex-1 min-h-0">
               <div className="space-y-3">
                 {calendarOrders[selectedCalendarDate]?.map(order => (
-                  <div key={order.id} className="border border-gray-200 rounded-lg p-3 hover:border-blue-300 transition">
+                  <div key={order.id} className="border border-gray-200 rounded-lg p-3 hover:border-emerald-300 transition">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <div className="text-xs text-gray-500 font-medium mb-1">{order.id}</div>
@@ -1248,13 +1252,13 @@ const InventoryDashboard = () => {
                       <div>
                         <div><span className="text-gray-500">Product:</span> <span className="font-medium">{order.product}</span></div>
                         {order.scheduledDate && (
-                          <div className="text-xs text-blue-600 mt-1 flex items-center gap-1 font-medium">
+                          <div className="text-xs text-emerald-600 mt-1 flex items-center gap-1 font-medium">
                             <CalendarIcon size={12} /> Delivery: {new Date(order.scheduledDate).toLocaleDateString()}
                           </div>
                         )}
                       </div>
                       <div>
-                        <span className="text-gray-500">Qty:</span> <span className="font-bold text-blue-600">{order.qty}</span>
+                        <span className="text-gray-500">Qty:</span> <span className="font-bold text-emerald-700">{order.qty}</span>
                       </div>
                     </div>
                   </div>
@@ -1265,7 +1269,7 @@ const InventoryDashboard = () => {
             <div className="px-4 py-3 text-sm border-t border-gray-100 flex justify-end shrink-0 bg-white">
               <button 
                 onClick={() => setIsCalendarModalOpen(false)}
-                className="px-5 py-2 bg-gray-900 text-white rounded-md hover:bg-gray-800 transition font-medium"
+                className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl transition font-bold shadow-sm shadow-emerald-500/20"
               >
                 Close
               </button>

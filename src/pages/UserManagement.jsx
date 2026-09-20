@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check } from 'lucide-react';
+import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check, Receipt } from 'lucide-react';
 
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
@@ -207,7 +207,7 @@ const UserManagement = () => {
       <div className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-            <UserCog className="text-blue-600" /> User Management
+            <UserCog className="text-emerald-600" /> User Management
           </h1>
           <p className="text-gray-500 text-sm mt-1">
             {assignedWarehouse 
@@ -218,7 +218,7 @@ const UserManagement = () => {
         {isSuper || isUserAdmin ? (
           <button 
             onClick={() => handleOpenModal()}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium flex items-center gap-2 shadow-sm"
           >
             <Plus size={18} /> Add New User
           </button>
@@ -275,16 +275,20 @@ const UserManagement = () => {
                         {user.role === 'Super Admin' ? (
                           <Shield size={14} className="text-indigo-600" />
                         ) : user.role === 'Admin' ? (
-                          <Shield size={14} className="text-blue-600" />
+                          <Shield size={14} className="text-teal-600" />
+                        ) : user.role === 'Cashier' ? (
+                          <Receipt size={14} className="text-emerald-600" />
                         ) : (
-                          <User size={14} className="text-emerald-600" />
+                          <User size={14} className="text-gray-600" />
                         )}
                         <span className={`font-medium ${
                           user.role === 'Super Admin' 
                             ? 'text-indigo-600' 
                             : user.role === 'Admin' 
-                            ? 'text-blue-600' 
-                            : 'text-emerald-700'
+                            ? 'text-teal-700 font-semibold' 
+                            : user.role === 'Cashier'
+                            ? 'text-emerald-700 font-semibold'
+                            : 'text-gray-700'
                         }`}>
                           {user.role}
                         </span>
@@ -304,7 +308,7 @@ const UserManagement = () => {
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleOpenModal(user)}
-                            className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
+                            className="p-1.5 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition"
                             title="Edit User"
                           >
                             <Edit2 size={16} />
@@ -355,7 +359,7 @@ const UserManagement = () => {
                       required
                       value={formData.name}
                       onChange={handleInputChange}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       placeholder="e.g. Nimal Perera"
                     />
                   </div>
@@ -368,7 +372,7 @@ const UserManagement = () => {
                       required
                       value={formData.email}
                       onChange={handleInputChange}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       placeholder="nimal@example.com"
                     />
                   </div>
@@ -384,7 +388,7 @@ const UserManagement = () => {
                     required={!editingUser}
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     placeholder={editingUser ? "Leave blank to keep existing password" : "Enter password"}
                   />
                 </div>
@@ -396,10 +400,11 @@ const UserManagement = () => {
                       name="role"
                       value={formData.role}
                       onChange={handleInputChange}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 font-medium"
                     >
                       <option value="Admin">Admin</option>
                       {isSuper && <option value="Super Admin">Super Admin</option>}
+                      <option value="Cashier">Cashier</option>
                       <option value="Customer">Customer</option>
                     </select>
                   </div>
@@ -411,7 +416,7 @@ const UserManagement = () => {
                       value={assignedWarehouse || formData.warehouse}
                       onChange={handleInputChange}
                       disabled={formData.role === 'Super Admin' || Boolean(assignedWarehouse)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100 disabled:text-gray-500"
                     >
                       {assignedWarehouse ? (
                         <option value={assignedWarehouse}>{assignedWarehouse}</option>
@@ -422,7 +427,7 @@ const UserManagement = () => {
                       )}
                     </select>
                     {assignedWarehouse && (
-                      <p className="text-xs text-blue-600 mt-1">Locked to your assigned branch ({assignedWarehouse}).</p>
+                      <p className="text-xs text-emerald-600 mt-1 font-medium">Locked to your assigned branch ({assignedWarehouse}).</p>
                     )}
                     {formData.role === 'Super Admin' && (
                       <p className="text-xs text-indigo-600 mt-1">Super Admins automatically have access to All Warehouses.</p>
@@ -440,7 +445,7 @@ const UserManagement = () => {
                         value="Active"
                         checked={formData.status === 'Active'}
                         onChange={handleInputChange}
-                        className="text-blue-600 focus:ring-blue-500"
+                        className="text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-sm text-gray-700">Active</span>
                     </label>
@@ -451,7 +456,7 @@ const UserManagement = () => {
                         value="Inactive"
                         checked={formData.status === 'Inactive'}
                         onChange={handleInputChange}
-                        className="text-blue-600 focus:ring-blue-500"
+                        className="text-emerald-600 focus:ring-emerald-500"
                       />
                       <span className="text-sm text-gray-700">Inactive</span>
                     </label>
@@ -474,12 +479,12 @@ const UserManagement = () => {
                       {availablePermissions.map(perm => {
                         const isChecked = formData.permissions.includes(perm.id) || formData.permissions.includes('all');
                         return (
-                          <label key={perm.id} className="flex items-start gap-3 p-3 bg-white rounded border border-gray-100 hover:border-blue-200 cursor-pointer transition shadow-sm">
+                          <label key={perm.id} className="flex items-start gap-3 p-3 bg-white rounded border border-gray-100 hover:border-emerald-200 cursor-pointer transition shadow-sm">
                             <input 
                               type="checkbox"
                               checked={isChecked}
                               onChange={() => handlePermissionToggle(perm.id)}
-                              className="mt-0.5 rounded text-blue-600 focus:ring-blue-500 border-gray-300"
+                              className="mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 border-gray-300"
                             />
                             <span className="text-xs font-medium text-gray-700 select-none">
                               {perm.label}
@@ -505,7 +510,7 @@ const UserManagement = () => {
               <button 
                 type="submit" 
                 form="userForm"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium shadow-sm"
               >
                 {editingUser ? 'Update User' : 'Create User'}
               </button>

@@ -50,7 +50,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden scale-[0.85] origin-center">
         <div className="flex justify-between items-center px-4 py-2 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-            <Truck className="text-blue-600" /> Schedule New Delivery
+            <Truck className="text-emerald-600" /> Schedule New Delivery
           </h2>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">
             <X size={20} />
@@ -74,7 +74,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.customerShopName}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -85,7 +85,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="Delivery Address"
                 value={formData.customerAddress}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -100,7 +100,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.storeId}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -112,7 +112,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.materialId}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -127,7 +127,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.quantity}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -136,7 +136,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 name="unit"
                 value={formData.unit}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="kg">kg</option>
                 <option value="ton">ton</option>
@@ -157,7 +157,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.scheduledDate}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -168,13 +168,13 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="e.g. Call upon arrival"
                 value={formData.notes}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               ></textarea>
             </div>
           </div>
           
-          <div className="bg-blue-50 p-3 rounded text-sm text-blue-800 flex items-center gap-2">
-            <AlertTriangle size={16} />
+          <div className="bg-emerald-50 p-3 rounded text-sm text-emerald-800 border border-emerald-100 flex items-center gap-2">
+            <AlertTriangle size={16} className="text-emerald-600" />
             <span>
               This will immediately deduct <strong>{formData.quantity || 0} {formData.unit}</strong> from the selected store's inventory.
             </span>
@@ -191,7 +191,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? 'Processing...' : 'Schedule Delivery'}
             </button>

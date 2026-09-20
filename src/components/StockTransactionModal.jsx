@@ -158,7 +158,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
               onClick={() => setActiveTab(tab.id)}
               className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-medium transition-colors
                 ${activeTab === tab.id 
-                  ? 'bg-white text-blue-600 border-b-2 border-blue-600' 
+                  ? 'bg-white text-emerald-700 border-b-2 border-emerald-600 font-semibold' 
                   : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
             >
               {tab.icon} {tab.label}
@@ -182,7 +182,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 value={formData.storeId}
                 onChange={handleInputChange}
                 disabled={Boolean(assignedWarehouse)}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-700"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-700"
               >
                 {!assignedWarehouse && <option value="">Select a Store</option>}
                 {stores
@@ -197,7 +197,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 required
                 value={formData.materialId}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 <option value="">Select a Material</option>
                 {materials.map(m => <option key={m._id} value={m._id}>{m.name} ({m.sku})</option>)}
@@ -217,7 +217,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 required
                 value={formData.quantity}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -226,7 +226,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 name="unit"
                 value={formData.unit}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               >
                 {availableUnits.map(u => (
                   <option key={u} value={u}>{u}</option>
@@ -245,7 +245,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 min="0"
                 value={formData.unitCost}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
             <div className="space-y-1 text-left">
@@ -257,7 +257,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 min="0"
                 value={formData.unitSellingPrice}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -271,7 +271,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 placeholder="PO-12345 or SO-98765"
                 value={formData.referenceNumber}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
               />
             </div>
 
@@ -281,7 +281,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
                 type="file" 
                 accept="image/*"
                 onChange={handleImageUpload}
-                className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full px-3 py-1.5 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
               />
               {formData.imageUrl && <img src={formData.imageUrl} alt="Preview" className="mt-2 h-16 object-cover rounded border border-gray-200" />}
             </div>
@@ -294,12 +294,12 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
               rows="1"
               value={formData.reason}
               onChange={handleInputChange}
-              className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             ></textarea>
           </div>
           
-          <div className="bg-blue-50 p-3 rounded text-sm text-blue-800 flex items-center gap-2">
-            <AlertTriangle size={16} />
+          <div className="bg-emerald-50 p-3 rounded text-sm text-emerald-800 border border-emerald-100 flex items-center gap-2">
+            <AlertTriangle size={16} className="text-emerald-600" />
             <span>
               Preview: Transacting <strong>{formData.quantity || 0} {formData.unit}</strong>. 
               {activeTab === 'ADJUSTMENT' && ' Note: For adjustments, use positive values to add stock and negative values to remove stock.'}
@@ -317,7 +317,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
             <button 
               type="submit" 
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {loading ? 'Processing...' : 'Confirm Transaction'}
             </button>

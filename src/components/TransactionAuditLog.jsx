@@ -39,8 +39,8 @@ const TransactionAuditLog = () => {
 
   const getTransactionIcon = (type) => {
     switch (type) {
-      case 'STOCK_IN': return <ArrowDownCircle className="text-green-500" size={18} />;
-      case 'STOCK_OUT': return <ArrowUpCircle className="text-blue-500" size={18} />;
+      case 'STOCK_IN': return <ArrowDownCircle className="text-emerald-500" size={18} />;
+      case 'STOCK_OUT': return <ArrowUpCircle className="text-teal-500" size={18} />;
       case 'RETURN_IN':
       case 'RETURN_OUT': return <RefreshCcw className="text-orange-500" size={18} />;
       case 'ADJUSTMENT': return <Activity className="text-purple-500" size={18} />;
@@ -50,8 +50,8 @@ const TransactionAuditLog = () => {
 
   const getTransactionBadge = (type) => {
     switch (type) {
-      case 'STOCK_IN': return <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-medium">Stock In</span>;
-      case 'STOCK_OUT': return <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">Stock Out</span>;
+      case 'STOCK_IN': return <span className="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-xs font-medium">Stock In</span>;
+      case 'STOCK_OUT': return <span className="px-2 py-1 bg-teal-100 text-teal-800 rounded text-xs font-medium">Stock Out</span>;
       case 'RETURN_IN': return <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs font-medium">Return In</span>;
       case 'RETURN_OUT': return <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs font-medium">Return Out</span>;
       case 'ADJUSTMENT': return <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-medium">Adjustment</span>;

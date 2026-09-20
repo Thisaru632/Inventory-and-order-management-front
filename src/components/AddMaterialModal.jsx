@@ -49,7 +49,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden scale-[0.85] origin-center">
         <div className="flex justify-between items-center px-4 py-2 border-b border-gray-100">
           <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-            <PackagePlus size={20} className="text-blue-600" />
+            <PackagePlus size={20} className="text-emerald-600" />
             Add New Material
           </h2>
           <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition">
@@ -74,7 +74,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
 
@@ -87,7 +87,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 required
                 value={formData.sku}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
@@ -101,7 +101,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 placeholder="e.g., Metals"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
             
@@ -111,7 +111,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 name="baseUnit"
                 value={formData.baseUnit}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               >
                 <option value="kg">kg</option>
                 <option value="ton">ton</option>
@@ -130,7 +130,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 min="0"
                 value={formData.minStockAlert}
                 onChange={handleInputChange}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
           </div>
@@ -146,7 +146,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
             <button 
               type="submit" 
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium disabled:opacity-50"
+              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-md hover:from-emerald-700 hover:to-teal-700 transition font-medium shadow-sm disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Add Material'}
             </button>
