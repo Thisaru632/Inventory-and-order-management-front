@@ -143,6 +143,7 @@ const DeliveryModal = ({ isOpen, onClose, onSuccess }) => {
                 <option value="pcs">pcs</option>
                 <option value="box">box</option>
                 <option value="m">m</option>
+                <option value="cube">cube</option>
               </select>
             </div>
           </div>

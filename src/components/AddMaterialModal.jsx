@@ -118,6 +118,7 @@ const AddMaterialModal = ({ isOpen, onClose, onSuccess }) => {
                 <option value="m">m</option>
                 <option value="pcs">pcs</option>
                 <option value="box">box</option>
+                <option value="cube">cube</option>
               </select>
             </div>
             

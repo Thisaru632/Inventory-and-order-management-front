@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Plus, Edit2, Trash2, MapPin, X } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
-import { isSuperAdmin, getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
+import { isSuperAdmin, isAdmin, getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const WarehouseManagement = () => {
   const isSuper = isSuperAdmin();
+  const isUserAdmin = isAdmin();
   const assignedWarehouse = getAssignedWarehouse();
   const [warehouses, setWarehouses] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,11 +34,15 @@ const WarehouseManagement = () => {
   }, []);
 
   const handleOpenModal = (warehouse = null) => {
-    if (!isSuper) {
-      alert('Only Super Admin is authorized to add or edit warehouses.');
+    if (!isSuper && !isUserAdmin) {
+      alert('Only authorized Admins can manage warehouses.');
       return;
     }
     if (warehouse) {
+      if (!isSuper && assignedWarehouse && !matchesWarehouse(warehouse.name, assignedWarehouse)) {
+        alert(`You are only authorized to manage your assigned branch (${assignedWarehouse}).`);
+        return;
+      }
       setEditingWarehouse(warehouse);
       setFormData({
         name: warehouse.name,
@@ -48,6 +53,10 @@ const WarehouseManagement = () => {
         image: warehouse.image || ''
       });
     } else {
+      if (!isSuper) {
+        alert('Only Super Admin is authorized to add new warehouses.');
+        return;
+      }
       setEditingWarehouse(null);
       setFormData({ name: '', location: '', capacity: '', status: 'Active', image: '' });
     }
@@ -79,7 +88,7 @@ const WarehouseManagement = () => {
     e.preventDefault();
     try {
       const payload = {
-        name: formData.name,
+        name: (!isSuper && editingWarehouse) ? editingWarehouse.name : formData.name,
         code: formData.code || formData.name.substring(0, 3).toUpperCase() + Date.now().toString().slice(-4),
         address: formData.location,
         capacity: formData.capacity,
@@ -128,7 +137,7 @@ const WarehouseManagement = () => {
           </button>
         ) : (
           <span className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-md border border-blue-200 font-medium">
-            Assigned: {assignedWarehouse || 'All Warehouses'}
+            Assigned Branch: {assignedWarehouse || 'All Warehouses'}
           </span>
         )}
       </div>
@@ -184,22 +193,24 @@ const WarehouseManagement = () => {
                       </span>
                     </td>
                     <td className="px-2 py-1 text-sm text-right">
-                      {isSuper ? (
+                      {isSuper || (assignedWarehouse && matchesWarehouse(warehouse.name, assignedWarehouse)) ? (
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleOpenModal(warehouse)}
                             className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                            title="Edit"
+                            title="Edit Branch Details"
                           >
                             <Edit2 size={16} />
                           </button>
-                          <button 
-                            onClick={() => handleDelete(warehouse._id)}
-                            className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
+                          {isSuper && (
+                            <button 
+                              onClick={() => handleDelete(warehouse._id)}
+                              className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
                         </div>
                       ) : (
                         <span className="text-xs text-gray-400 italic">View Only</span>
@@ -235,9 +246,13 @@ const WarehouseManagement = () => {
                   required
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={!isSuper}
+                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-600"
                   placeholder="e.g. North Wing Storage"
                 />
+                {!isSuper && (
+                  <p className="text-xs text-gray-400 mt-0.5">Branch name is fixed to your assigned branch.</p>
+                )}
               </div>
 
               <div className="space-y-1">

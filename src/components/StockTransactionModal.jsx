@@ -139,7 +139,7 @@ const StockTransactionModal = ({ isOpen, onClose, onSuccess, initialTab = 'STOCK
   const selectedMaterial = materials.find(m => m._id === formData.materialId);
   const availableUnits = selectedMaterial 
     ? [selectedMaterial.baseUnit, ...(selectedMaterial.conversions || []).map(c => c.unit)]
-    : ['kg', 'ton', 'pcs', 'box'];
+    : ['kg', 'ton', 'pcs', 'box', 'm', 'cube'];
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">

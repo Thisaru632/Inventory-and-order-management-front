@@ -4,7 +4,7 @@ import { UserCog, Plus, Edit2, Trash2, Shield, User, X, Check } from 'lucide-rea
 import axios from 'axios';
 import { API_BASE_URL } from '../config/api';
 import inventoryService from '../services/inventoryService';
-import { isSuperAdmin } from '../utils/auth';
+import { isSuperAdmin, isAdmin, getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
 const availablePermissions = [
   { id: 'manage_inventory', label: 'Manage Inventory (Add/Edit/Delete)' },
@@ -15,6 +15,8 @@ const availablePermissions = [
 
 const UserManagement = () => {
   const isSuper = isSuperAdmin();
+  const isUserAdmin = isAdmin();
+  const assignedWarehouse = getAssignedWarehouse();
   const [users, setUsers] = useState([]);
   const [warehouseList, setWarehouseList] = useState(['All Warehouses']);
   const [loading, setLoading] = useState(true);
@@ -73,18 +75,26 @@ const UserManagement = () => {
     permissions: []
   });
 
-  const handleOpenModal = (user = null) => {
-    if (!isSuper) {
-      alert('Only Super Admin is authorized to add or edit users.');
+  const handleOpenModal = (userToEdit = null) => {
+    if (!isSuper && !isUserAdmin) {
+      alert('Only authorized admin users can manage users.');
       return;
     }
-    if (user) {
-      setEditingUser(user);
+    if (userToEdit) {
+      if (!isSuper && (userToEdit.role === 'Super Admin' || userToEdit.role === 'superadmin')) {
+        alert('You are not authorized to edit Super Admin users.');
+        return;
+      }
+      if (!isSuper && assignedWarehouse && !matchesWarehouse(userToEdit.warehouse, assignedWarehouse)) {
+        alert(`You can only edit users belonging to your assigned branch (${assignedWarehouse}).`);
+        return;
+      }
+      setEditingUser(userToEdit);
       setFormData({
-        ...user,
+        ...userToEdit,
         password: '',
-        warehouse: user.warehouse || 'All Warehouses',
-        permissions: [...(user.permissions || [])]
+        warehouse: assignedWarehouse || userToEdit.warehouse || 'All Warehouses',
+        permissions: [...(userToEdit.permissions || [])]
       });
     } else {
       setEditingUser(null);
@@ -93,9 +103,9 @@ const UserManagement = () => {
         email: '', 
         password: '', 
         role: 'Admin', 
-        warehouse: warehouseList.length > 1 ? warehouseList[1] : 'All Warehouses', 
+        warehouse: assignedWarehouse || (warehouseList.length > 1 ? warehouseList[1] : 'All Warehouses'), 
         status: 'Active', 
-        permissions: ['view_inventory'] 
+        permissions: ['view_inventory', 'manage_inventory', 'manage_deliveries'] 
       });
     }
     setIsModalOpen(true);
@@ -128,9 +138,15 @@ const UserManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Auto assign 'all' permission if role is Super Admin
     const finalData = { ...formData };
-    if (finalData.role === 'Super Admin') {
+    
+    // For branch admins, lock warehouse to their assigned branch and prevent setting role to Super Admin
+    if (!isSuper && assignedWarehouse) {
+      finalData.warehouse = assignedWarehouse;
+      if (finalData.role === 'Super Admin') {
+        finalData.role = 'Admin';
+      }
+    } else if (finalData.role === 'Super Admin') {
       finalData.permissions = ['all'];
       finalData.warehouse = 'All Warehouses';
     }
@@ -165,7 +181,15 @@ const UserManagement = () => {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id, targetUser = null) => {
+    if (!isSuper && targetUser && (targetUser.role === 'Super Admin' || targetUser.role === 'superadmin')) {
+      alert('Cannot delete Super Admin user');
+      return;
+    }
+    if (!isSuper && targetUser && assignedWarehouse && !matchesWarehouse(targetUser.warehouse, assignedWarehouse)) {
+      alert(`You can only delete users belonging to your assigned branch (${assignedWarehouse}).`);
+      return;
+    }
     if (window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
       try {
         const res = await axios.delete(`${API_BASE_URL}/api/auth/${id}`);
@@ -185,9 +209,13 @@ const UserManagement = () => {
           <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
             <UserCog className="text-blue-600" /> User Management
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Manage system users, access control, and assignments</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {assignedWarehouse 
+              ? `Manage system users, staff access, and assignments for ${assignedWarehouse}`
+              : 'Manage system users, access control, and assignments across all branches'}
+          </p>
         </div>
-        {isSuper ? (
+        {isSuper || isUserAdmin ? (
           <button 
             onClick={() => handleOpenModal()}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium flex items-center gap-2"
@@ -196,7 +224,7 @@ const UserManagement = () => {
           </button>
         ) : (
           <span className="text-xs bg-amber-50 text-amber-700 px-3 py-1.5 rounded-md border border-amber-200 font-medium">
-            Super Admin Access Required
+            Admin Access Required
           </span>
         )}
       </div>
@@ -220,14 +248,16 @@ const UserManagement = () => {
                     Loading users...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : users.filter(u => isSuper || !assignedWarehouse || matchesWarehouse(u.warehouse, assignedWarehouse)).length === 0 ? (
                 <tr>
                   <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
-                    No users found.
+                    No users found for {assignedWarehouse || 'all locations'}.
                   </td>
                 </tr>
               ) : (
-                users.map((user) => (
+                users
+                  .filter(u => isSuper || !assignedWarehouse || matchesWarehouse(u.warehouse, assignedWarehouse))
+                  .map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50/50 transition">
                     <td className="px-2 py-1 text-sm">
                       <div className="flex items-center gap-3">
@@ -270,7 +300,7 @@ const UserManagement = () => {
                       </span>
                     </td>
                     <td className="px-2 py-1 text-sm text-right">
-                      {isSuper ? (
+                      {isSuper || isUserAdmin ? (
                         <div className="flex justify-end gap-2">
                           <button 
                             onClick={() => handleOpenModal(user)}
@@ -280,7 +310,7 @@ const UserManagement = () => {
                             <Edit2 size={16} />
                           </button>
                           <button 
-                            onClick={() => handleDelete(user.id)}
+                            onClick={() => handleDelete(user.id, user)}
                             className={`p-1.5 rounded transition ${user.role === 'Super Admin' ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:text-red-600 hover:bg-red-50'}`}
                             title={user.role === 'Super Admin' ? "Cannot delete Super Admin" : "Delete User"}
                             disabled={user.role === 'Super Admin'}
@@ -369,7 +399,7 @@ const UserManagement = () => {
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
                     >
                       <option value="Admin">Admin</option>
-                      <option value="Super Admin">Super Admin</option>
+                      {isSuper && <option value="Super Admin">Super Admin</option>}
                       <option value="Customer">Customer</option>
                     </select>
                   </div>
@@ -378,15 +408,22 @@ const UserManagement = () => {
                     <label className="text-xs font-medium text-gray-700">Warehouse Assignment</label>
                     <select 
                       name="warehouse"
-                      value={formData.warehouse}
+                      value={assignedWarehouse || formData.warehouse}
                       onChange={handleInputChange}
-                      disabled={formData.role === 'Super Admin'}
+                      disabled={formData.role === 'Super Admin' || Boolean(assignedWarehouse)}
                       className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
                     >
-                      {warehouseList.map(w => (
-                        <option key={w} value={w}>{w}</option>
-                      ))}
+                      {assignedWarehouse ? (
+                        <option value={assignedWarehouse}>{assignedWarehouse}</option>
+                      ) : (
+                        warehouseList.map(w => (
+                          <option key={w} value={w}>{w}</option>
+                        ))
+                      )}
                     </select>
+                    {assignedWarehouse && (
+                      <p className="text-xs text-blue-600 mt-1">Locked to your assigned branch ({assignedWarehouse}).</p>
+                    )}
                     {formData.role === 'Super Admin' && (
                       <p className="text-xs text-indigo-600 mt-1">Super Admins automatically have access to All Warehouses.</p>
                     )}

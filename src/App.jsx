@@ -330,8 +330,8 @@ function App() {
                 )}
               </div>
               
-              {/* User Management - Super Admin Only */}
-              {isSuper && (
+              {/* User Management */}
+              {isAdminUser && (
                 <Link 
                   to="/users" 
                   className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition"
