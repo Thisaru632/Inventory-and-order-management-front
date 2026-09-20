@@ -24,9 +24,10 @@ const createDelivery = async (data) => {
   return response.data;
 };
 
-const updateDeliveryStatus = async (id, status, scheduledDate = null) => {
+const updateDeliveryStatus = async (id, status, scheduledDate = null, feedback = null) => {
   const payload = { status };
   if (scheduledDate) payload.scheduledDate = scheduledDate;
+  if (feedback) payload.feedback = feedback;
   const response = await axios.put(`${API_URL}/${id}/status`, payload);
   return response.data;
 };

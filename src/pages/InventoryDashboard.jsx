@@ -79,7 +79,8 @@ const InventoryDashboard = () => {
         customer: d.customerShopName || 'Unknown Customer',
         product: d.material?.name || 'Unknown Product',
         qty: `${d.quantity} ${d.unit || ''}`.trim(),
-        status: d.status || 'PENDING'
+        status: d.status || 'PENDING',
+        scheduledDate: d.scheduledDate
       });
     }
   });
@@ -1245,7 +1246,12 @@ const InventoryDashboard = () => {
                     </div>
                     <div className="text-sm text-gray-700 bg-gray-50 p-3 rounded-md border border-gray-100 flex justify-between items-center mt-3">
                       <div>
-                        <span className="text-gray-500">Product:</span> <span className="font-medium">{order.product}</span>
+                        <div><span className="text-gray-500">Product:</span> <span className="font-medium">{order.product}</span></div>
+                        {order.scheduledDate && (
+                          <div className="text-xs text-blue-600 mt-1 flex items-center gap-1 font-medium">
+                            <CalendarIcon size={12} /> Delivery: {new Date(order.scheduledDate).toLocaleDateString()}
+                          </div>
+                        )}
                       </div>
                       <div>
                         <span className="text-gray-500">Qty:</span> <span className="font-bold text-blue-600">{order.qty}</span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCcw, Truck, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { RefreshCcw, Truck, MapPin, CheckCircle, XCircle, Calendar, Star, MessageSquare } from 'lucide-react';
 import deliveryService from '../services/deliveryService';
 import { getAssignedWarehouse, matchesWarehouse } from '../utils/auth';
 
@@ -114,14 +114,16 @@ const DeliveryManagement = () => {
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Customer Shop</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Material</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700 text-right">Quantity</th>
+                <th className="px-2 py-1 text-sm font-semibold text-gray-700">Delivery Date</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700">Status</th>
+                <th className="px-2 py-1 text-sm font-semibold text-gray-700">Customer Feedback</th>
                 <th className="px-2 py-1 text-sm font-semibold text-gray-700 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {deliveries.filter(d => d.status !== 'PENDING').length === 0 ? (
                 <tr>
-                  <td colSpan="5" className="px-4 py-8 text-center text-gray-500">
+                  <td colSpan="7" className="px-4 py-8 text-center text-gray-500">
                     No deliveries scheduled yet.
                   </td>
                 </tr>
@@ -144,12 +146,51 @@ const DeliveryManagement = () => {
                       {delivery.quantity} <span className="text-blue-300 text-xs ml-1">{delivery.unit}</span>
                     </td>
                     <td className="px-2 py-1 text-sm">
+                      {delivery.scheduledDate ? (
+                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
+                          <Calendar size={12} className="text-blue-500" />
+                          {new Date(delivery.scheduledDate).toLocaleDateString()}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">Not specified</span>
+                      )}
+                    </td>
+                    <td className="px-2 py-1 text-sm">
                       <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium 
                         ${delivery.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 
                           delivery.status === 'CANCELLED' ? 'bg-red-100 text-red-800' : 
                           'bg-yellow-100 text-yellow-800'}`}>
                         {delivery.status}
                       </span>
+                    </td>
+                    <td className="px-2 py-1 text-sm">
+                      {delivery.feedback && (delivery.feedback.productRating || delivery.feedback.sellerRating || delivery.feedback.comment) ? (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {delivery.feedback.productRating > 0 && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 text-[11px] font-bold border border-amber-200" title={`Product Rating: ${delivery.feedback.productRating} / 5`}>
+                                <Star size={11} className="fill-amber-400 text-amber-500" />
+                                Prod: {delivery.feedback.productRating}★
+                              </span>
+                            )}
+                            {delivery.feedback.sellerRating > 0 && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 text-[11px] font-bold border border-blue-200" title={`Seller Rating: ${delivery.feedback.sellerRating} / 5`}>
+                                <Star size={11} className="fill-blue-400 text-blue-500" />
+                                Seller: {delivery.feedback.sellerRating}★
+                              </span>
+                            )}
+                          </div>
+                          {delivery.feedback.comment ? (
+                            <div className="text-xs text-gray-600 bg-gray-50 p-1.5 rounded-md border border-gray-100 max-w-xs break-words" title={delivery.feedback.comment}>
+                              <span className="italic font-medium">"{delivery.feedback.comment}"</span>
+                            </div>
+                          ) : null}
+                        </div>
+                      ) : delivery.status === 'DELIVERED' ? (
+                        <span className="text-xs text-gray-400 italic">No feedback yet</span>
+                      ) : (
+                        <span className="text-xs text-gray-300">—</span>
+                      )}
                     </td>
                     <td className="px-2 py-1 text-sm text-right">
                       {delivery.status === 'DISPATCHED' || delivery.status === 'PENDING' ? (
@@ -189,7 +230,7 @@ const DeliveryManagement = () => {
                   <th className="px-2 py-1 text-sm font-semibold text-gray-700">Order ID</th>
                   <th className="px-2 py-1 text-sm font-semibold text-gray-700">Customer</th>
                   <th className="px-2 py-1 text-sm font-semibold text-gray-700">Product</th>
-                  <th className="px-2 py-1 text-sm font-semibold text-gray-700">Total</th>
+                  <th className="px-2 py-1 text-sm font-semibold text-gray-700">Delivery Date</th>
                   <th className="px-2 py-1 text-sm font-semibold text-gray-700">Status</th>
                   <th className="px-2 py-1 text-sm font-semibold text-gray-700 text-right">Actions</th>
                 </tr>
@@ -207,17 +248,21 @@ const DeliveryManagement = () => {
                       <td className="px-2 py-1 text-xs font-medium text-blue-600">DEL-{order._id.substring(order._id.length - 6).toUpperCase()}</td>
                       <td className="px-2 py-1 text-xs font-medium text-gray-800">
                         {order.customerShopName}
-                        {order.scheduledDate && (
-                          <div className="text-xs text-purple-600 mt-1">
-                            Scheduled: {new Date(order.scheduledDate).toLocaleDateString()}
-                          </div>
-                        )}
                       </td>
                       <td className="px-2 py-1 text-sm">
                         <div className="font-medium text-gray-800">{order.material?.name || 'Unknown Material'}</div>
                         <div className="text-xs text-gray-500">Qty: {order.quantity} {order.unit}</div>
                       </td>
-                      <td className="px-2 py-1 text-sm font-bold text-gray-900">-</td>
+                      <td className="px-2 py-1 text-sm">
+                        {order.scheduledDate ? (
+                          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100 shadow-sm">
+                            <Calendar size={12} className="text-blue-500" />
+                            {new Date(order.scheduledDate).toLocaleDateString()}
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400 italic">Not specified</span>
+                        )}
+                      </td>
                       <td className="px-2 py-1 text-sm">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium 
                           ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 
@@ -238,7 +283,18 @@ const DeliveryManagement = () => {
                             {order.status === 'PENDING' && (
                               <>
                                 <button 
-                                  onClick={() => setScheduleModalData(order._id)}
+                                  onClick={() => {
+                                    setScheduleModalData(order._id);
+                                    if (order.scheduledDate) {
+                                      try {
+                                        setSelectedDate(new Date(order.scheduledDate).toISOString().split('T')[0]);
+                                      } catch (e) {
+                                        setSelectedDate('');
+                                      }
+                                    } else {
+                                      setSelectedDate('');
+                                    }
+                                  }}
                                   className="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 rounded transition"
                                 >
                                   Schedule
@@ -249,7 +305,7 @@ const DeliveryManagement = () => {
                                       await deliveryService.updateDeliveryStatus(order._id, 'DISPATCHED');
                                       fetchDeliveries();
                                     } catch (err) {
-                                      alert('Failed to dispatch order');
+                                      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to dispatch order');
                                     }
                                   }}
                                   className="px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded transition"
@@ -275,45 +331,74 @@ const DeliveryManagement = () => {
       {/* Schedule Modal */}
       {scheduleModalData && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-3">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Schedule Delivery</h2>
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm overflow-hidden p-4">
+            <h2 className="text-lg font-bold text-gray-800 mb-2">Schedule Delivery</h2>
+            {(() => {
+              const currentOrder = deliveries.find(d => d._id === scheduleModalData);
+              return currentOrder ? (
+                <div className="mb-4 p-2.5 bg-gray-50 rounded-lg text-xs text-gray-600 space-y-1 border border-gray-100">
+                  <div><span className="font-semibold text-gray-700">Customer:</span> {currentOrder.customerShopName}</div>
+                  <div><span className="font-semibold text-gray-700">Product:</span> {currentOrder.material?.name} ({currentOrder.quantity} {currentOrder.unit})</div>
+                </div>
+              ) : null;
+            })()}
             
-            <div className="mb-6">
+            <div className="mb-5">
               <label className="block text-xs font-medium text-gray-700 mb-1">Select Delivery Date</label>
               <input 
                 type="date" 
                 value={selectedDate}
                 min={new Date().toISOString().split('T')[0]}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm font-medium"
               />
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <button 
+                  disabled={!selectedDate}
+                  onClick={async () => {
+                    try {
+                      await deliveryService.updateDeliveryStatus(scheduleModalData, 'PENDING', selectedDate);
+                      setScheduleModalData(null);
+                      setSelectedDate('');
+                      fetchDeliveries();
+                    } catch (err) {
+                      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to update delivery date');
+                    }
+                  }}
+                  className="flex-1 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-bold transition border border-blue-200 disabled:opacity-50"
+                  title="Save scheduled delivery date without dispatching yet"
+                >
+                  Schedule Date Only
+                </button>
+                <button 
+                  disabled={!selectedDate}
+                  onClick={async () => {
+                    try {
+                      await deliveryService.updateDeliveryStatus(scheduleModalData, 'DISPATCHED', selectedDate);
+                      setScheduleModalData(null);
+                      setSelectedDate('');
+                      fetchDeliveries();
+                    } catch (err) {
+                      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to schedule delivery');
+                    }
+                  }}
+                  className="flex-1 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold hover:bg-purple-700 transition disabled:opacity-50 shadow-sm"
+                  title="Save date and dispatch immediately (deducts warehouse inventory)"
+                >
+                  Schedule & Dispatch
+                </button>
+              </div>
               <button 
                 onClick={() => {
                   setScheduleModalData(null);
                   setSelectedDate('');
                 }}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition"
+                className="w-full py-2 bg-gray-100 text-gray-600 rounded-lg text-xs font-medium hover:bg-gray-200 transition"
               >
                 Cancel
-              </button>
-              <button 
-                disabled={!selectedDate}
-                onClick={async () => {
-                  try {
-                    await deliveryService.updateDeliveryStatus(scheduleModalData, 'DISPATCHED', selectedDate);
-                    setScheduleModalData(null);
-                    setSelectedDate('');
-                    fetchDeliveries();
-                  } catch (err) {
-                    alert('Failed to schedule delivery');
-                  }
-                }}
-                className="flex-1 py-2 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700 transition disabled:opacity-50"
-              >
-                Schedule & Dispatch
               </button>
             </div>
           </div>

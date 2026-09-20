@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Search, Filter, ShoppingBag, X, MapPin, Phone } from 'lucide-react';
+import { ShoppingCart, Search, Filter, ShoppingBag, X, MapPin, Phone, Calendar } from 'lucide-react';
 import inventoryService from '../services/inventoryService';
 import deliveryService from '../services/deliveryService';
 
@@ -11,6 +11,13 @@ const CustomerItemList = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [orderQuantity, setOrderQuantity] = useState(1);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const [deliveryDate, setDeliveryDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  });
 
   // Auto-get logged in customer registration details
   const currentUser = (() => {
@@ -204,6 +211,22 @@ const CustomerItemList = () => {
                 </div>
               </div>
 
+              {/* Delivery Date Selection */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1.5 flex items-center gap-1.5">
+                  <Calendar size={13} className="text-blue-600" />
+                  Select Delivery Date *
+                </label>
+                <input 
+                  type="date"
+                  min={todayStr}
+                  value={deliveryDate}
+                  onChange={(e) => setDeliveryDate(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium text-sm text-gray-800 bg-white"
+                />
+              </div>
+
               {/* Delivery info pre-filled automatically from registration */}
               <div className="p-3 bg-blue-50/50 rounded-xl border border-blue-100 text-xs">
                 <div className="flex items-center gap-1.5 font-semibold text-blue-800 mb-1">
@@ -236,6 +259,11 @@ const CustomerItemList = () => {
                 <button 
                   disabled={isPlacingOrder}
                   onClick={async () => {
+                    if (!deliveryDate) {
+                      alert('Please select a delivery date');
+                      return;
+                    }
+
                     setIsPlacingOrder(true);
                     try {
                       const orderName = currentUser.name || currentUser.email?.split('@')[0] || 'Customer';
@@ -249,6 +277,7 @@ const CustomerItemList = () => {
                         quantity: orderQuantity,
                         unit: selectedProduct.material.baseUnit,
                         status: 'PENDING',
+                        scheduledDate: deliveryDate,
                         notes: 'Ordered via Customer Portal'
                       });
                       
